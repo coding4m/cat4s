@@ -22,9 +22,11 @@ lazy val aggregateProjects: Seq[ProjectReference] = Seq(
   core,
   osPlugin,
   akkaPlugin,
+  jdbcPlugin,
   flumeReporter,
   fluentdReporter,
-  logstashReporter
+  logstashReporter,
+  consoleReporter
 )
 
 lazy val core = (project in file("cat4s-core"))
@@ -53,6 +55,32 @@ lazy val osPlugin = (project in file("cat4s-plugin-os"))
 
 lazy val akkaPlugin = (project in file("cat4s-plugin-akka"))
   .settings(name := "cat4s-plugin-akka")
+  .settings(commonSettings: _*)
+  .settings(integrationTestSettings: _*)
+  .settings(libraryDependencies ++= Seq(LogbackClassic))
+  .settings(libraryDependencies ++= Seq(Json4sJackson, Json4sExt))
+  .settings(libraryDependencies ++= Seq(Flume))
+  .settings(libraryDependencies ++= Seq(Javaslang % "test", JunitInterface % "test", Scalatest % "test,it"))
+  .settings(integrationTestPublishSettings: _*)
+  .dependsOn(core)
+  .configs(IntegrationTest, MultiJvm)
+  .enablePlugins(HeaderPlugin, AutomateHeaderPlugin)
+
+lazy val jdbcPlugin = (project in file("cat4s-plugin-jdbc"))
+  .settings(name := "cat4s-plugin-jdbc")
+  .settings(commonSettings: _*)
+  .settings(integrationTestSettings: _*)
+  .settings(libraryDependencies ++= Seq(LogbackClassic))
+  .settings(libraryDependencies ++= Seq(Json4sJackson, Json4sExt))
+  .settings(libraryDependencies ++= Seq(Flume))
+  .settings(libraryDependencies ++= Seq(Javaslang % "test", JunitInterface % "test", Scalatest % "test,it"))
+  .settings(integrationTestPublishSettings: _*)
+  .dependsOn(core)
+  .configs(IntegrationTest, MultiJvm)
+  .enablePlugins(HeaderPlugin, AutomateHeaderPlugin)
+
+lazy val consoleReporter = (project in file("cat4s-reporter-console"))
+  .settings(name := "cat4s-reporter-console")
   .settings(commonSettings: _*)
   .settings(integrationTestSettings: _*)
   .settings(libraryDependencies ++= Seq(LogbackClassic))

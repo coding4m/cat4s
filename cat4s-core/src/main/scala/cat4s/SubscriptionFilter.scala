@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package cat4s.metric
+package cat4s
 
 /**
  * @author siuming
  */
-class SubscriptionDispatcher {
+class SubscriptionFilter {
 
 }

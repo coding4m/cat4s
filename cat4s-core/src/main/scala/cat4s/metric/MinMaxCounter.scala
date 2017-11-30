@@ -30,6 +30,7 @@ class MinMaxCounter extends Instrument {
     override def applyAsLong(left: Long, right: Long) = Math.max(left, right)
   }, 0L)
   private val count = new LongAdder
+
   override type Record = Long
   override type Snapshot = MinMaxCounterSnapshot
   override def record(value: Long) = {

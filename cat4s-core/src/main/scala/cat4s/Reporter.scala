@@ -16,9 +16,11 @@
 
 package cat4s
 
+import cat4s.metric.MetricSnapshot
+
 /**
  * @author siuming
  */
 trait Reporter {
-
+  def report(snapshot: MetricSnapshot)
 }

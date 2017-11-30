@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package cat4s.metric
+package cat4s.aspectj
 
 /**
  * @author siuming
  */
-class MetricRegistry {
-  def collect(ctx: InstrumentContext): MetricSnapshot = ???
+class AspectWeaver {
+
 }

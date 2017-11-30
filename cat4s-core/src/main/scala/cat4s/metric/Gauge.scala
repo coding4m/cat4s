@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicReference
  */
 class Gauge extends Instrument {
   private val _value = new AtomicReference[Any]()
-  override type Value = Any
+  override type Record = Any
   override type Snapshot = GaugeSnapshot
   override def record(value: Any) = _value.set(value)
   override def refresh() = {}

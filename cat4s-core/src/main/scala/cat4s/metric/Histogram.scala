@@ -24,7 +24,7 @@ import com.codahale.metrics.Reservoir
 class Histogram(percentiles: Array[Long], reservoir: Reservoir) extends Instrument {
   require(percentiles.forall(_ > 0) && percentiles.forall(_ <= 100), "percentile must be in (0..100].")
 
-  override type Value = Long
+  override type Record = Long
   override type Snapshot = HistogramSnapshot
   override def record(value: Long) = reservoir.update(value)
   override def refresh() = {}

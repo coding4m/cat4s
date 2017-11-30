@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.LongAdder
  */
 class Counter extends Instrument {
   private val adder = new LongAdder
-  override type Value = Long
+  override type Record = Long
   override type Snapshot = CounterSnapshot
   override def record(value: Long) = adder.add(value)
   override def refresh() = adder.reset()

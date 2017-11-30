@@ -25,7 +25,7 @@ class Timer(rates: Array[Long], percentiles: Array[Long], reservoir: Reservoir) 
   private val meter = new Meter(rates)
   private val histogram = new Histogram(percentiles, reservoir)
 
-  override type Value = Long
+  override type Record = Long
   override type Snapshot = TimerSnapshot
   override def record(value: Long) = {
     if (value >= 0) {

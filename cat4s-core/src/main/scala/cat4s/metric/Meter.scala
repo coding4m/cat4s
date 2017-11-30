@@ -41,7 +41,7 @@ class Meter(rates: Array[Long]) extends Instrument {
   private val startTick = clock.getTick
   private val lastTick = new AtomicLong(startTick)
 
-  override type Value = Long
+  override type Record = Long
   override type Snapshot = MeterSnapshot
   override def record(value: Long) = {
     tickIfNecessary()

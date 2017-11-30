@@ -19,6 +19,4 @@ package cat4s.metric
 /**
  * @author siuming
  */
-class MetricUnit {
-
-}
+case class CounterSnapshot(value: Long) extends InstrumentSnapshot

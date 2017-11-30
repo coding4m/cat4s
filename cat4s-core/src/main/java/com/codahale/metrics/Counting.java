@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package cat4s.metric
+package com.codahale.metrics;
 
 /**
- * @author siuming
+ * An interface for metric types which have counts.
  */
-trait Instrument {
-  type Value
-  type Snapshot <: InstrumentSnapshot
-  def record(value: Value): Unit
-  def refresh(): Unit
-  def collect(ctx: InstrumentContext): Snapshot
-  def cleanup(): Unit
+public interface Counting {
+    /**
+     * Returns the current count.
+     *
+     * @return the current count
+     */
+    long getCount();
 }

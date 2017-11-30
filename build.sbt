@@ -19,6 +19,7 @@ isSnapshot in ThisBuild := true
 //fork in ThisBuild := true
 
 lazy val aggregateProjects: Seq[ProjectReference] = Seq(
+  aspectj,
   core,
   osPlugin,
   akkaPlugin,
@@ -28,6 +29,17 @@ lazy val aggregateProjects: Seq[ProjectReference] = Seq(
   logstashReporter,
   consoleReporter
 )
+
+lazy val aspectj = (project in file("cat4s-aspectj"))
+  .settings(name := "cat4s-aspectj")
+  .settings(commonSettings: _*)
+  .settings(integrationTestSettings: _*)
+  .settings(libraryDependencies ++= Seq(Disruptor))
+  .settings(libraryDependencies ++= Seq(LogbackCore))
+  .settings(libraryDependencies ++= Seq(Javaslang % "test", JunitInterface % "test", Scalatest % "test,it"))
+  .settings(integrationTestPublishSettings: _*)
+  .configs(IntegrationTest, MultiJvm)
+  .enablePlugins(HeaderPlugin, AutomateHeaderPlugin)
 
 lazy val core = (project in file("cat4s-core"))
   .settings(name := "cat4s-core")

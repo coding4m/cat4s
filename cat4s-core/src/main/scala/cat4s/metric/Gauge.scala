@@ -16,14 +16,17 @@
 
 package cat4s.metric
 
+import java.util.concurrent.atomic.AtomicReference
+
 /**
  * @author siuming
  */
-trait Instrument {
-  type Value
-  type Snapshot <: InstrumentSnapshot
-  def record(value: Value): Unit
-  def refresh(): Unit
-  def collect(ctx: InstrumentContext): Snapshot
-  def cleanup(): Unit
+class Gauge extends Instrument {
+  private val _value = new AtomicReference[Any]()
+  override type Value = Any
+  override type Snapshot = GaugeSnapshot
+  override def record(value: Any) = _value.set(value)
+  override def refresh() = {}
+  override def collect(ctx: InstrumentContext) = GaugeSnapshot(_value.get())
+  override def cleanup() = {}
 }

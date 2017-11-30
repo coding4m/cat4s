@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
-package cat4s.metric
+package com.codahale.metrics;
 
 /**
- * @author siuming
+ * An object which samples values.
  */
-trait Metric {
-
+public interface Sampling {
+    /**
+     * Returns a snapshot of the values.
+     *
+     * @return a snapshot of the values
+     */
+    Snapshot getSnapshot();
 }

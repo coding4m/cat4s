@@ -16,14 +16,17 @@
 
 package cat4s.metric
 
+import java.util.concurrent.atomic.LongAdder
+
 /**
  * @author siuming
  */
-trait Instrument {
-  type Value
-  type Snapshot <: InstrumentSnapshot
-  def record(value: Value): Unit
-  def refresh(): Unit
-  def collect(ctx: InstrumentContext): Snapshot
-  def cleanup(): Unit
+class Counter extends Instrument {
+  private val adder = new LongAdder
+  override type Value = Long
+  override type Snapshot = CounterSnapshot
+  override def record(value: Long) = adder.add(value)
+  override def refresh() = adder.reset()
+  override def collect(ctx: InstrumentContext) = CounterSnapshot(adder.sum())
+  override def cleanup() = {}
 }

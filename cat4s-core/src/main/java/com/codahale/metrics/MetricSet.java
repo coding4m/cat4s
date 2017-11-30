@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package cat4s.metric
+package com.codahale.metrics;
+
+import java.util.Map;
 
 /**
- * @author siuming
+ * A set of named metrics.
+ *
+ * @see MetricRegistry#registerAll(MetricSet)
  */
-trait Instrument {
-  type Value
-  type Snapshot <: InstrumentSnapshot
-  def record(value: Value): Unit
-  def refresh(): Unit
-  def collect(ctx: InstrumentContext): Snapshot
-  def cleanup(): Unit
+public interface MetricSet extends Metric {
+    /**
+     * A map of metric names to metrics.
+     *
+     * @return the metrics
+     */
+    Map<String, Metric> getMetrics();
 }

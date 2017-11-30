@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-package cat4s.metric
+package com.codahale.metrics;
 
 /**
- * @author siuming
+ * A tag interface to indicate that a class is a metric.
  */
-trait Instrument {
-  type Value
-  type Snapshot <: InstrumentSnapshot
-  def record(value: Value): Unit
-  def refresh(): Unit
-  def collect(ctx: InstrumentContext): Snapshot
-  def cleanup(): Unit
+public interface Metric {
+
 }

@@ -19,6 +19,7 @@ package cat4s.metric
 /**
  * @author siuming
  */
-class MetricContext {
-
+trait SampleRecorderFactory[T <: SampleRecorder] {
+  def catelog: String
+  def createRecorder(instrumentFactory: InstrumentFactory): T
 }

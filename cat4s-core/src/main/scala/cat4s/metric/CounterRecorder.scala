@@ -19,11 +19,4 @@ package cat4s.metric
 /**
  * @author siuming
  */
-trait Instrument {
-  type Value
-  type Snapshot <: InstrumentSnapshot
-  def record(value: Value): Unit
-  def refresh(): Unit
-  def collect(ctx: InstrumentContext): Snapshot
-  def cleanup(): Unit
-}
+class CounterRecorder(val key: InstrumentKey, val instrument: Counter) extends InstrumentRecorder

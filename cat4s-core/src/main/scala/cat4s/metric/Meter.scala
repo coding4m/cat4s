@@ -35,7 +35,7 @@ object Meter {
 class Meter(rates: Array[Long]) extends Instrument {
 
   private val count = new LongAdder
-  private val ewmas = rates.map(Meter.ewma)
+  private val ewmas = rates.map(it => it -> Meter.ewma(it)).toMap
 
   private val clock = Clock.defaultClock()
   private val startTick = clock.getTick
@@ -43,26 +43,20 @@ class Meter(rates: Array[Long]) extends Instrument {
 
   override type Value = Long
   override type Snapshot = MeterSnapshot
-
   override def record(value: Long) = {
     tickIfNecessary()
     count.add(value)
-    ewmas.foreach(_.update(value))
+    ewmas.values.foreach(_.update(value))
   }
-
   override def refresh() = {}
-
   override def collect(ctx: InstrumentContext) = {
     tickIfNecessary()
-    //todo
     MeterSnapshot(
       count.sum(),
-      rates = ewmas.map(it => s"rate${it}m" -> it.getRate(TimeUnit.SECONDS)).toMap
+      rates = ewmas.map(it => s"r${it._1}" -> it._2.getRate(TimeUnit.SECONDS))
     )
   }
-
   override def cleanup() = {}
-
   private def tickIfNecessary() = {
     val oldTick = lastTick.get
     val newTick = clock.getTick
@@ -72,7 +66,7 @@ class Meter(rates: Array[Long]) extends Instrument {
       if (lastTick.compareAndSet(oldTick, newIntervalStartTick)) {
         val requiredTicks = age / Meter.TicketInterval
         for (_ <- 0 until requiredTicks.toInt) {
-          ewmas.foreach(_.tick())
+          ewmas.values.foreach(_.tick())
         }
       }
     }

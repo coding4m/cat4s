@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package cat4s.metric
+package cat4s.util
 
 /**
  * @author siuming
  */
-class MetricRegistry {
-  def sample[T <: SampleRecorder](recorderFactory: SampleRecorderFactory[T], name: String): T = ???
-  def removeSample() = ???
-  def collect(ctx: InstrumentContext): MetricSnapshot = ???
+object TrieMapSyntax {
+
 }

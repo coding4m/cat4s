@@ -16,9 +16,70 @@
 
 package cat4s.metric
 
+import com.codahale.metrics.{ ExponentiallyDecayingReservoir, Reservoir }
+
+import scala.collection.concurrent.TrieMap
+
 /**
  * @author siuming
  */
-class GenericRecorder {
+object GenericRecorder {
+  val DefaultRates = Array(1L, 5L, 15L)
+  val DefaultReservoir = new ExponentiallyDecayingReservoir()
+  val DefaultPercentiles = Array(1L, 5L, 10L, 90L, 95L, 99L)
+}
+abstract class GenericRecorder(instrumentFactory: InstrumentFactory) extends SampleRecorder {
+  import GenericRecorder._
 
+  private val _instruments = TrieMap.empty[InstrumentKey, Instrument]
+  private def register[T <: Instrument](key: InstrumentKey, instrument: ⇒ T): T = ???
+  private def unregister(key: InstrumentKey): Unit = _instruments.remove(key).foreach(_.cleanup())
+
+  protected def counter(name: String, unit: InstrumentUnit, resetAfterCollect: Boolean = false): Counter =
+    register(CounterKey(name, unit), new Counter(resetAfterCollect))
+  protected def removeCounter(name: String, unit: InstrumentUnit): Unit =
+    unregister(CounterKey(name, unit))
+
+  protected def minMaxCounter(name: String, unit: InstrumentUnit, resetAfterCollect: Boolean = true): MinMaxCounter =
+    register(MinMaxCounterKey(name, unit), new MinMaxCounter(resetAfterCollect))
+  protected def removeMinMaxCounter(name: String, unit: InstrumentUnit): Unit =
+    unregister(MinMaxCounterKey(name, unit))
+
+  protected def gauge(name: String, unit: InstrumentUnit, identity: Any, resetAfterCollect: Boolean = false): Gauge =
+    register(GaugeKey(name, unit), new Gauge(identity, resetAfterCollect))
+  protected def removeGauge(name: String, unit: InstrumentUnit): Unit =
+    unregister(GaugeKey(name, unit))
+
+  def meter(name: String, unit: InstrumentUnit, rates: Array[Long] = DefaultRates): Meter =
+    register(MeterKey(name, unit), new Meter(rates))
+  def removeMeter(name: String, unit: InstrumentUnit): Unit =
+    unregister(MeterKey(name, unit))
+
+  def timer(
+    name: String,
+    unit: InstrumentUnit,
+    rates: Array[Long] = DefaultRates,
+    percentiles: Array[Long] = DefaultPercentiles,
+    reservoir: Reservoir = DefaultReservoir): Timer =
+    register(TimerKey(name, unit), new Timer(rates, percentiles, reservoir))
+  def removeTimer(name: String, unit: InstrumentUnit): Unit =
+    unregister(TimerKey(name, unit))
+
+  def histogram(
+    name: String,
+    unit: InstrumentUnit,
+    percentiles: Array[Long] = DefaultPercentiles,
+    reservoir: Reservoir = DefaultReservoir): Histogram =
+    register(HistogramKey(name, unit), new Histogram(percentiles, reservoir))
+  def removeHistogram(name: String, unit: InstrumentUnit): Unit =
+    unregister(HistogramKey(name, unit))
+
+  override def collect(ctx: InstrumentContext) = {
+    val snapshots = Map.newBuilder[InstrumentKey, InstrumentSnapshot]
+    _instruments.foreach {
+      case (key, instrument) => snapshots += key -> instrument.collect(ctx)
+    }
+    SampleSnapshot(snapshots.result())
+  }
+  override def cleanup() = _instruments.values.foreach(_.cleanup())
 }

@@ -19,10 +19,6 @@ package cat4s.trace
 /**
  * @author siuming
  */
-trait TraceContext {
-  def parentId: Option[String]
-  def traceId: String
-  def traceName: Option[String]
+trait TraceLevel {
 
-  def startAction()
 }

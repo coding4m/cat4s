@@ -19,10 +19,8 @@ package cat4s.trace
 /**
  * @author siuming
  */
-trait TraceContext {
-  def parentId: Option[String]
-  def traceId: String
-  def traceName: Option[String]
+object TraceProtocol {
 
-  def startAction()
+  case class Transaction()
+  case class TransactionAction()
 }

@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-package cat4s.trace
+package cat4s
 
 /**
  * @author siuming
  */
-trait TraceContext {
-  def parentId: Option[String]
-  def traceId: String
-  def traceName: Option[String]
+class AccumulateReporterSettings {
 
-  def startAction()
 }

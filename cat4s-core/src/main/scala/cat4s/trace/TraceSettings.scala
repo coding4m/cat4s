@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package cat4s
+package cat4s.trace
 
 /**
  * @author siuming
  */
-object SubscriptionProtocol {
+class TraceSettings {
 
 }

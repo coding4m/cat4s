@@ -21,13 +21,13 @@ import java.util.concurrent.atomic.AtomicReference
 /**
  * @author siuming
  */
-class Gauge extends Instrument {
-  private val _value = new AtomicReference[Any]()
+class Gauge(identity: Any, resetAfterCollect: Boolean) extends Instrument {
+  private val _value = new AtomicReference[Any]
 
   override type Record = Any
   override type Snapshot = GaugeSnapshot
   override def record(value: Any) = _value.set(value)
-  override def refresh() = {}
-  override def collect(ctx: InstrumentContext) = GaugeSnapshot(_value.get())
-  override def cleanup() = {}
+  override def collect(ctx: InstrumentContext) = {
+    if (resetAfterCollect) GaugeSnapshot(_value.getAndSet(identity)) else GaugeSnapshot(_value.get())
+  }
 }

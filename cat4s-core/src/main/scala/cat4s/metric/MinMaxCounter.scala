@@ -22,7 +22,7 @@ import java.util.function.LongBinaryOperator
 /**
  * @author siuming
  */
-class MinMaxCounter extends Instrument {
+class MinMaxCounter(resetAfterCollect: Boolean) extends Instrument {
   private val min = new LongAccumulator(new LongBinaryOperator {
     override def applyAsLong(left: Long, right: Long) = Math.min(left, right)
   }, 0L)
@@ -41,11 +41,23 @@ class MinMaxCounter extends Instrument {
       max.accumulate(count.sum())
     }
   }
-  override def refresh() = {
-    min.reset()
-    max.reset()
-    count.reset()
+  override def collect(ctx: InstrumentContext) = {
+    if (resetAfterCollect) {
+      val current = {
+        val value = count.sum()
+        if (value <= 0) 0 else value
+      }
+      val currentMin = {
+        val rawMin = min.get()
+        min.accumulate(-current)
+        if (rawMin >= 0) 0 else Math.abs(rawMin)
+      }
+      val currentMax = {
+        val rawMax = max.get()
+        max.accumulate(current)
+        rawMax
+      }
+      MinMaxCounterSnapshot(currentMin, currentMax, current)
+    } else MinMaxCounterSnapshot(min.get(), max.get(), count.sum())
   }
-  override def collect(ctx: InstrumentContext) = MinMaxCounterSnapshot(min.get(), max.get(), count.sum())
-  override def cleanup() = {}
 }

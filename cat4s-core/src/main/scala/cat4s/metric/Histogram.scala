@@ -28,7 +28,6 @@ class Histogram(percentiles: Array[Long], reservoir: Reservoir) extends Instrume
   override type Record = Long
   override type Snapshot = HistogramSnapshot
   override def record(value: Long) = reservoir.update(value)
-  override def refresh() = {}
   override def collect(ctx: InstrumentContext) = {
     val snapshot = reservoir.getSnapshot
     HistogramSnapshot(

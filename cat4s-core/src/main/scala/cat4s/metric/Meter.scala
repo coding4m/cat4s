@@ -48,7 +48,6 @@ class Meter(rates: Array[Long]) extends Instrument {
     count.add(value)
     ewmas.values.foreach(_.update(value))
   }
-  override def refresh() = {}
   override def collect(ctx: InstrumentContext) = {
     tickIfNecessary()
     MeterSnapshot(
@@ -56,7 +55,6 @@ class Meter(rates: Array[Long]) extends Instrument {
       rates = ewmas.map(it => s"r${it._1}" -> it._2.getRate(TimeUnit.SECONDS))
     )
   }
-  override def cleanup() = {}
   private def tickIfNecessary() = {
     val oldTick = lastTick.get
     val newTick = clock.getTick

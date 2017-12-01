@@ -23,7 +23,6 @@ trait Instrument {
   type Record
   type Snapshot <: InstrumentSnapshot
   def record(value: Record): Unit
-  def refresh(): Unit
   def collect(ctx: InstrumentContext): Snapshot
-  def cleanup(): Unit
+  def cleanup(): Unit = {}
 }

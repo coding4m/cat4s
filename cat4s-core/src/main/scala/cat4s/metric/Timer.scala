@@ -33,7 +33,6 @@ class Timer(rates: Array[Long], percentiles: Array[Long], reservoir: Reservoir) 
       histogram.record(value)
     }
   }
-  override def refresh() = {}
   override def collect(ctx: InstrumentContext) = {
     val ms = meter.collect(ctx)
     val hs = histogram.collect(ctx)
@@ -47,5 +46,4 @@ class Timer(rates: Array[Long], percentiles: Array[Long], reservoir: Reservoir) 
       hs.percentiles
     )
   }
-  override def cleanup() = {}
 }

@@ -22,6 +22,10 @@ package cat4s.trace
 trait Segment {
   def name: String
   def data: Map[String, String]
-  def status(): TraceStatus
+  def clock: TraceClock
+  def status: TraceStatus
+
+  def isSuccess: Boolean = isCompleted && status.status == TraceStatus.Ok
+  def isCompleted: Boolean = null != status
   def complete(status: TraceStatus): Unit
 }

@@ -22,7 +22,9 @@ import scala.util.{ Failure, Success }
 /**
  * @author siuming
  */
-class SegmentCollector private[trace] (ctx: TraceContext, segment: Segment, handler: TraceHandler) {
+class SegmentCollector private[trace] (segment: Segment, handler: TraceHandler) {
+
+  def apply[T](f: => T): T = collect(f)
 
   def collect[T](f: => T): T = {
     try {
@@ -35,6 +37,8 @@ class SegmentCollector private[trace] (ctx: TraceContext, segment: Segment, hand
         throw e
     }
   }
+
+  def apply[T](f: => Future[T])(implicit ec: ExecutionContext): Future[T] = collect(f)
 
   def collect[T](f: => Future[T])(implicit ec: ExecutionContext): Future[T] = {
     f.andThen {

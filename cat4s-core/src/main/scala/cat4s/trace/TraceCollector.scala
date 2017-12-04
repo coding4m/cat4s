@@ -40,35 +40,46 @@ object TraceCollector {
     handler: TraceHandler) extends TraceContext {
     @volatile private var _status: TraceStatus = _
     @volatile private var _clock: TraceClock = TraceClock(startNano = System.nanoTime(), elapsedNano = -1L)
-    override def status = _status
-    override def clock = _clock
+    @volatile private var _segments: Seq[Segment] = Seq.empty
+    override val status = _status
+    override val clock = _clock
     override def complete(status: TraceStatus) = {
+      assert(!isCompleted, "context has been completed.")
+      assert(_segments.forall(_.isCompleted), "segments must all completed.")
       this._status = status
       this._clock = this._clock.copy(elapsedNano = System.nanoTime() - this._clock.startNano)
     }
-    override def newSegment(): SegmentCollector = new SegmentCollector(this, null, handler)
+    override def newSegment(name: String, data: Map[String, String]): SegmentCollector = {
+      val segment = DefaultSegment(name, data)
+      this._segments = this._segments :+ segment
+      new SegmentCollector(segment, handler)
+    }
   }
 
   private case class DefaultSegment(name: String, data: Map[String, String]) extends Segment {
     @volatile private var _status: TraceStatus = _
-    override def status() = _status
+    @volatile private var _clock: TraceClock = TraceClock(startNano = System.nanoTime(), elapsedNano = -1L)
+    override val status = _status
+    override val clock = _clock
     override def complete(status: TraceStatus) = {
+      assert(!isCompleted, "segment has been completed.")
       this._status = status
+      this._clock = this._clock.copy(elapsedNano = System.nanoTime() - this._clock.startNano)
     }
   }
 }
 class TraceCollector private[trace] (name: String, source: TraceSource) {
   import TraceCollector._
 
-  private var traceId: Option[String] = Some(UUID.randomUUID().toString)
+  private var traceId: Option[String] = None
   private var parentId: Option[String] = None
-  private var id: Option[String] = Some(UUID.randomUUID().toString)
+  private var id: Option[String] = None
   private var tags: Seq[String] = Seq.empty
   private var data: Map[String, String] = Map.empty
   private var handler = DefaultHandler
 
   def withTraceId(traceId: Option[String]): TraceCollector = {
-    this.traceId = traceId.orElse(this.traceId)
+    this.traceId = traceId
     this
   }
 
@@ -78,7 +89,7 @@ class TraceCollector private[trace] (name: String, source: TraceSource) {
   }
 
   def withId(id: Option[String]): TraceCollector = {
-    this.id = id.orElse(this.id)
+    this.id = id
     this
   }
 
@@ -140,9 +151,9 @@ class TraceCollector private[trace] (name: String, source: TraceSource) {
   }
 
   private def buildContext(): TraceContext = DefaultContext(
-    traceId.get,
+    traceId.getOrElse(UUID.randomUUID().toString),
     parentId,
-    id.get,
+    id.getOrElse(UUID.randomUUID().toString),
     name,
     tags,
     data,

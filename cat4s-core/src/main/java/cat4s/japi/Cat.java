@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package cat4s
+package cat4s.japi;
 
 /**
  * @author siuming
  */
-class AccumulateReporterSettings {
-
+public class Cat {
 }

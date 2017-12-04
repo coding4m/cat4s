@@ -36,7 +36,8 @@ trait TraceContext {
   def isCompleted: Boolean = null != status
   def complete(status: TraceStatus): Unit
 
-  def newSegment(): SegmentCollector
-  def withSegment[T](f: => T): T = newSegment().collect(f)
-  def withSegment[T](f: => Future[T])(implicit ec: ExecutionContext): Future[T] = newSegment().collect(f)
+  def newSegment(name: String): SegmentCollector = newSegment(name, Map.empty[String, String])
+  def newSegment(name: String, data: Map[String, String]): SegmentCollector
+  def withSegment[T](name: String, data: Map[String, String])(f: => T): T = newSegment(name, data).collect(f)
+  def withSegment[T](name: String, data: Map[String, String])(f: => Future[T])(implicit ec: ExecutionContext): Future[T] = newSegment(name, data).collect(f)
 }

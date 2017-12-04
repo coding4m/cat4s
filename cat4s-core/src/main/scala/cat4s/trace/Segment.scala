@@ -16,6 +16,8 @@
 
 package cat4s.trace
 
+import scala.concurrent.{ ExecutionContext, Future }
+
 /**
  * @author siuming
  */
@@ -28,4 +30,9 @@ trait Segment {
   def isSuccess: Boolean = isCompleted && status.status == TraceStatus.Ok
   def isCompleted: Boolean = null != status
   def complete(status: TraceStatus): Unit
+
+  def apply[T](f: => T): T = collect(f)
+  def apply[T](f: => Future[T])(implicit ec: ExecutionContext): Future[T] = collect(f)
+  def collect[T](f: => T): T
+  def collect[T](f: => Future[T])(implicit ec: ExecutionContext): Future[T]
 }

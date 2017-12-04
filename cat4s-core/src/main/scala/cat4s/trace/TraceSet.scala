@@ -26,7 +26,7 @@ trait TraceSet {
   def subscribe(): Unit
   def unsubscribe(): Unit
 
-  def newContext(name: String, source: TraceSource): TraceCollector
+  def newContext(name: String, source: TraceSource): Trace
   def withContext[T](name: String, source: TraceSource)(f: TraceContext => T): T = newContext(name, source).collect(f)
   def withContext[T](name: String, source: TraceSource)(f: TraceContext => Future[T])(implicit ec: ExecutionContext): Future[T] = newContext(name, source).collect(f)
 }

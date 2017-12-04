@@ -24,7 +24,7 @@ import scala.util.{ Failure, Success }
 /**
  * @author siuming
  */
-object TraceCollector {
+object Trace {
   val DefaultHandler = new TraceHandler {
     override def resolve(cause: Throwable) = TraceStatus(-1, cause.getMessage)
   }
@@ -49,14 +49,14 @@ object TraceCollector {
       this._status = status
       this._clock = this._clock.copy(elapsedNano = System.nanoTime() - this._clock.startNano)
     }
-    override def newSegment(name: String, data: Map[String, String]): SegmentCollector = {
-      val segment = DefaultSegment(name, data)
+    override def newSegment(name: String, data: Map[String, String]): Segment = {
+      val segment = DefaultSegment(name, data, handler)
       this._segments = this._segments :+ segment
-      new SegmentCollector(segment, handler)
+      segment
     }
   }
 
-  private case class DefaultSegment(name: String, data: Map[String, String]) extends Segment {
+  private case class DefaultSegment(name: String, data: Map[String, String], handler: TraceHandler) extends Segment {
     @volatile private var _status: TraceStatus = _
     @volatile private var _clock: TraceClock = TraceClock(startNano = System.nanoTime(), elapsedNano = -1L)
     override val status = _status
@@ -66,10 +66,29 @@ object TraceCollector {
       this._status = status
       this._clock = this._clock.copy(elapsedNano = System.nanoTime() - this._clock.startNano)
     }
+
+    override def collect[T](f: => T) = {
+      try {
+        val result = f
+        complete(TraceStatus.OkStatus)
+        result
+      } catch {
+        case e: Throwable =>
+          complete(handler.resolve(e))
+          throw e
+      }
+    }
+
+    override def collect[T](f: => Future[T])(implicit ec: ExecutionContext) = {
+      f.andThen {
+        case Success(_) => complete(TraceStatus.OkStatus)
+        case Failure(e) => complete(handler.resolve(e))
+      }
+    }
   }
 }
-class TraceCollector private[trace] (name: String, source: TraceSource) {
-  import TraceCollector._
+class Trace private[trace] (name: String, source: TraceSource) {
+  import Trace._
 
   private var traceId: Option[String] = None
   private var parentId: Option[String] = None
@@ -78,47 +97,47 @@ class TraceCollector private[trace] (name: String, source: TraceSource) {
   private var data: Map[String, String] = Map.empty
   private var handler = DefaultHandler
 
-  def withTraceId(traceId: Option[String]): TraceCollector = {
+  def withTraceId(traceId: Option[String]): Trace = {
     this.traceId = traceId
     this
   }
 
-  def withParentId(parentId: Option[String]): TraceCollector = {
+  def withParentId(parentId: Option[String]): Trace = {
     this.parentId = parentId
     this
   }
 
-  def withId(id: Option[String]): TraceCollector = {
+  def withId(id: Option[String]): Trace = {
     this.id = id
     this
   }
 
-  def withTag(tag: String): TraceCollector = {
+  def withTag(tag: String): Trace = {
     this.tags = this.tags :+ tag
     this
   }
 
-  def withTags(tags: Seq[String]): TraceCollector = {
+  def withTags(tags: Seq[String]): Trace = {
     this.tags = this.tags ++ tags
     this
   }
 
-  def withData(name: String, value: String): TraceCollector = {
+  def withData(name: String, value: String): Trace = {
     data = data + (name -> value)
     this
   }
 
-  def withDatas(tags: Map[String, String]): TraceCollector = {
+  def withDatas(tags: Map[String, String]): Trace = {
     this.data = this.data ++ tags
     this
   }
 
-  def withHandler(handler: TraceHandler): TraceCollector = {
+  def withHandler(handler: TraceHandler): Trace = {
     this.handler = handler
     this
   }
 
-  def withHandler(pf: PartialFunction[Throwable, TraceStatus]): TraceCollector = {
+  def withHandler(pf: PartialFunction[Throwable, TraceStatus]): Trace = {
     this.handler = new TraceHandler {
       override def resolve(cause: Throwable) = if (pf.isDefinedAt(cause)) pf(cause) else DefaultHandler.resolve(cause)
     }

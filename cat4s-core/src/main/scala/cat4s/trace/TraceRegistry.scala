@@ -23,8 +23,8 @@ import scala.concurrent.{ ExecutionContext, Future }
  */
 class TraceRegistry {
 
-  def newContext(name: String, source: TraceSource): TraceCollector = {
-    new TraceCollector(name, source)
+  def newContext(name: String, source: TraceSource): Trace = {
+    new Trace(name, source)
   }
 
   def withContext[T](name: String, source: TraceSource)(f: TraceContext => T): T = {

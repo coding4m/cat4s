@@ -21,23 +21,18 @@ import scala.concurrent.{ ExecutionContext, Future }
 /**
  * @author siuming
  */
-trait TraceContext {
-  def traceId: String
-  def parentId: Option[String]
-  def id: String
+trait TraceSegment {
   def name: String
-  def tags: Seq[String]
   def data: Map[String, String]
   def clock: TraceClock
   def status: TraceStatus
-  def source: TraceSource
 
   def isSuccess: Boolean = isCompleted && status.status == TraceStatus.Ok
   def isCompleted: Boolean = null != status
   def complete(status: TraceStatus): Unit
 
-  def newSegment(name: String): TraceSegment = newSegment(name, Map.empty[String, String])
-  def newSegment(name: String, data: Map[String, String]): TraceSegment
-  def withSegment[T](name: String, data: Map[String, String])(f: => T): T = newSegment(name, data)(f)
-  def withSegment[T](name: String, data: Map[String, String])(f: => Future[T])(implicit ec: ExecutionContext): Future[T] = newSegment(name, data)(f)
+  def apply[T](f: => T): T = collect(f)
+  def apply[T](f: => Future[T])(implicit ec: ExecutionContext): Future[T] = collect(f)
+  def collect[T](f: => T): T
+  def collect[T](f: => Future[T])(implicit ec: ExecutionContext): Future[T]
 }

@@ -40,7 +40,7 @@ object Trace {
     handler: TraceHandler) extends TraceContext {
     @volatile private var _status: TraceStatus = _
     @volatile private var _clock: TraceClock = TraceClock(startNano = System.nanoTime(), elapsedNano = -1L)
-    @volatile private var _segments: Seq[Segment] = Seq.empty
+    @volatile private var _segments: Seq[TraceSegment] = Seq.empty
     override val status = _status
     override val clock = _clock
     override def complete(status: TraceStatus) = {
@@ -49,14 +49,14 @@ object Trace {
       this._status = status
       this._clock = this._clock.copy(elapsedNano = System.nanoTime() - this._clock.startNano)
     }
-    override def newSegment(name: String, data: Map[String, String]): Segment = {
+    override def newSegment(name: String, data: Map[String, String]): TraceSegment = {
       val segment = DefaultSegment(name, data, handler)
       this._segments = this._segments :+ segment
       segment
     }
   }
 
-  private case class DefaultSegment(name: String, data: Map[String, String], handler: TraceHandler) extends Segment {
+  private case class DefaultSegment(name: String, data: Map[String, String], handler: TraceHandler) extends TraceSegment {
     @volatile private var _status: TraceStatus = _
     @volatile private var _clock: TraceClock = TraceClock(startNano = System.nanoTime(), elapsedNano = -1L)
     override val status = _status

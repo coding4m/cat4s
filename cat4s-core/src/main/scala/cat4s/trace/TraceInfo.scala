@@ -19,8 +19,6 @@ package cat4s.trace
 /**
  * @author siuming
  */
-object TraceProtocol {
+class TraceInfo {
 
-  private[trace] case class Subscribe()
-  private[trace] case class Unsubscribe()
 }

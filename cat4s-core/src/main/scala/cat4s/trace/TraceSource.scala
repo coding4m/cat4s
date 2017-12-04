@@ -19,6 +19,4 @@ package cat4s.trace
 /**
  * @author siuming
  */
-trait TraceAction {
-
-}
+case class TraceSource(host: String, port: Int, serviceName: Option[String] = None)

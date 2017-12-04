@@ -16,9 +16,17 @@
 
 package cat4s.trace
 
+import scala.concurrent.{ ExecutionContext, Future }
+
 /**
  * @author siuming
  */
 trait TraceSet {
 
+  def subscribe(): Unit
+  def unsubscribe(): Unit
+
+  def newContext(name: String, source: TraceSource): TraceCollector = new TraceCollector(name, source)
+  def withContext[T](name: String, source: TraceSource)(f: TraceContext => T): T = newContext(name, source).collect(f)
+  def withContext[T](name: String, source: TraceSource)(f: TraceContext => Future[T])(implicit ec: ExecutionContext): Future[T] = newContext(name, source).collect(f)
 }

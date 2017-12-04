@@ -19,6 +19,9 @@ package cat4s.trace
 /**
  * @author siuming
  */
-class AsyncContext {
-
+object TraceStatus {
+  val Ok = 0
+  val OkMsg = "ok."
+  val OkStatus = TraceStatus()
 }
+case class TraceStatus(status: Int = TraceStatus.Ok, message: String = TraceStatus.OkMsg)

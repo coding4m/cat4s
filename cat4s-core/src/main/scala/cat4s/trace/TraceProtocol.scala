@@ -22,5 +22,8 @@ package cat4s.trace
 object TraceProtocol {
 
   case class Transaction()
-  case class TransactionAction()
+  case class TransactionSegment()
+
+  private[trace] case class Subscribe()
+  private[trace] case class Unsubscribe()
 }

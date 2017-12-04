@@ -16,13 +16,27 @@
 
 package cat4s.trace
 
+import scala.concurrent.{ ExecutionContext, Future }
+
 /**
  * @author siuming
  */
 trait TraceContext {
-  def parentId: Option[String]
   def traceId: String
-  def traceName: Option[String]
+  def parentId: Option[String]
+  def id: String
+  def name: String
+  def tags: Seq[String]
+  def data: Map[String, String]
+  def clock: TraceClock
+  def status: TraceStatus
+  def source: TraceSource
 
-  def startAction()
+  def isSuccess: Boolean = isCompleted && status.status == TraceStatus.Ok
+  def isCompleted: Boolean = null != status
+  def complete(status: TraceStatus): Unit
+
+  def newSegment(): SegmentCollector
+  def withSegment[T](f: => T): T = newSegment().collect(f)
+  def withSegment[T](f: => Future[T])(implicit ec: ExecutionContext): Future[T] = newSegment().collect(f)
 }

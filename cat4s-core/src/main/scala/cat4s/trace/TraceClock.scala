@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package cat4s.metric
+package cat4s.trace
 
 /**
+  * todo
  * @author siuming
  */
-object MetricSubscriptionProtocol {
-
-}
+case class TraceClock(startNano: Long, elapsedNano: Long)

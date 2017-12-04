@@ -19,6 +19,9 @@ package cat4s.trace
 /**
  * @author siuming
  */
-class AsyncAction {
-
+trait Segment {
+  def name: String
+  def data: Map[String, String]
+  def status(): TraceStatus
+  def complete(status: TraceStatus): Unit
 }

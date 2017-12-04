@@ -19,6 +19,6 @@ package cat4s.trace
 /**
  * @author siuming
  */
-class EmptyAction {
-
+trait TraceHandler {
+  def resolve(cause: Throwable): TraceStatus
 }

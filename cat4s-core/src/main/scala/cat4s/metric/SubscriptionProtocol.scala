@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package cat4s.trace
+package cat4s.metric
 
 /**
  * @author siuming
  */
-class EmptyContext {
+object SubscriptionProtocol {
 
 }

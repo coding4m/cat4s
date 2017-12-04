@@ -17,21 +17,29 @@
 package cat4s.trace
 
 import scala.concurrent.{ ExecutionContext, Future }
+import scala.util.{ Failure, Success }
 
 /**
  * @author siuming
  */
-class TraceRegistry {
+class SegmentCollector private[trace] (ctx: TraceContext, segment: Segment, handler: TraceHandler) {
 
-  def newContext(name: String, source: TraceSource): TraceCollector = {
-    new TraceCollector(name, source)
+  def collect[T](f: => T): T = {
+    try {
+      val result = f
+      segment.complete(TraceStatus.OkStatus)
+      result
+    } catch {
+      case e: Throwable =>
+        segment.complete(handler.resolve(e))
+        throw e
+    }
   }
 
-  def withContext[T](name: String, source: TraceSource)(f: TraceContext => T): T = {
-    newContext(name, source).collect(f)
-  }
-
-  def withContext[T](name: String, source: TraceSource)(f: TraceContext => Future[T])(implicit ec: ExecutionContext): Future[T] = {
-    newContext(name, source).collect(f)
+  def collect[T](f: => Future[T])(implicit ec: ExecutionContext): Future[T] = {
+    f.andThen {
+      case Success(_) => segment.complete(TraceStatus.OkStatus)
+      case Failure(e) => segment.complete(handler.resolve(e))
+    }
   }
 }

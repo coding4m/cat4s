@@ -19,6 +19,19 @@ package cat4s.trace
 /**
  * @author siuming
  */
-class TraceSnapshot {
-
-}
+case class TraceSnapshot(
+  traceId: String,
+  parentId: Option[String],
+  id: String,
+  name: String,
+  tags: Seq[String],
+  data: Map[String, String],
+  status: Int,
+  message: String,
+  startTime: Long,
+  elapsedNano: Long,
+  sourceHost: String,
+  sourcePort: Int,
+  sourceName: Option[String],
+  segments: Seq[SegmentSnapshot]
+)

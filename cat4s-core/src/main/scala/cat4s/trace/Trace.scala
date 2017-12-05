@@ -41,17 +41,36 @@ object Trace {
     source: TraceSource,
     handler: TraceHandler,
     dispatcher: ActorRef) extends TraceContext {
+    private val startTime = System.currentTimeMillis()
+    private val startNano = System.nanoTime()
+
     @volatile private var _status: TraceStatus = _
-    @volatile private var _clock: TraceClock = TraceClock(startNano = System.nanoTime(), elapsedNano = -1L)
     @volatile private var _segments: Seq[Segment] = Seq.empty
+    @volatile private var _clock: TraceClock = TraceClock(startTime = startTime, elapsedNano = 0L)
+
     override val status = _status
     override val clock = _clock
     override def complete(status: TraceStatus) = {
       assert(!isCompleted, "context has been completed.")
       assert(_segments.forall(_.isCompleted), "segments must all completed.")
       this._status = status
-      this._clock = this._clock.copy(elapsedNano = System.nanoTime() - this._clock.startNano)
-      dispatcher ! null //todo
+      this._clock = this._clock.copy(elapsedNano = System.nanoTime() - this.startNano)
+      dispatcher ! TraceSnapshot(
+        traceId,
+        parentId,
+        id,
+        name,
+        tags,
+        data,
+        status.status,
+        status.message,
+        clock.startTime,
+        clock.elapsedNano,
+        source.host,
+        source.port,
+        source.name,
+        _segments.map(it => SegmentSnapshot(it.name, it.data, it.status.status, it.status.message, it.clock.startTime, it.clock.elapsedNano))
+      )
     }
     override def newSegment(name: String, data: Map[String, String]): Segment = {
       val segment = DefaultSegment(name, data, handler)
@@ -61,14 +80,17 @@ object Trace {
   }
 
   private case class DefaultSegment(name: String, data: Map[String, String], handler: TraceHandler) extends Segment {
+    private val startTime = System.currentTimeMillis()
+    private val startNano = System.nanoTime()
+
     @volatile private var _status: TraceStatus = _
-    @volatile private var _clock: TraceClock = TraceClock(startNano = System.nanoTime(), elapsedNano = -1L)
+    @volatile private var _clock: TraceClock = TraceClock(startTime = startTime, elapsedNano = -1L)
     override val status = _status
     override val clock = _clock
     override def complete(status: TraceStatus) = {
       assert(!isCompleted, "segment has been completed.")
       this._status = status
-      this._clock = this._clock.copy(elapsedNano = System.nanoTime() - this._clock.startNano)
+      this._clock = this._clock.copy(elapsedNano = System.nanoTime() - startNano)
     }
 
     override def collect[T](f: => T) = {

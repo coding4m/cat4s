@@ -20,4 +20,4 @@ package cat4s.trace
  * todo
  * @author siuming
  */
-case class TraceClock(startNano: Long, elapsedNano: Long)
+case class TraceClock(startTime: Long, elapsedNano: Long)

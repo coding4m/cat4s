@@ -58,6 +58,7 @@ object Cat {
     tracer
       .trace("", null)
       .withTraceId(Some(""))
+      .withParentId(None)
       .withId(Some(""))
       .withTag("")
       .withData("", "")

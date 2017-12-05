@@ -19,6 +19,10 @@ package cat4s.trace
 /**
  * @author siuming
  */
-class SegmentSnapshot {
-
-}
+case class SegmentSnapshot(
+  name: String,
+  data: Map[String, String],
+  status: Int,
+  message: String,
+  startTime: Long,
+  elapsedNano: Long)

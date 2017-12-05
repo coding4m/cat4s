@@ -15,18 +15,22 @@
  */
 
 package cat4s.trace
-import akka.actor.{ ActorRef, ExtendedActorSystem, Extension }
+import akka.actor.{ ActorRef, ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider }
 
 /**
  * @author siuming
  */
-object TraceRegistry {
-
+object TraceRegistry extends ExtensionId[TraceRegistry] with ExtensionIdProvider {
+  override def lookup() = TraceRegistry
+  override def createExtension(system: ExtendedActorSystem) = new TraceRegistry(system)
 }
 class TraceRegistry(system: ExtendedActorSystem) extends Extension with TraceSet {
   import TraceProtocol._
+  import TraceDispatcher._
   val dispatcher = system.actorOf(TraceDispatcher.props(), TraceDispatcher.Name)
   override def trace(name: String, source: TraceSource): Trace = new Trace(name, source, dispatcher)
   override def subscribe(subscriber: ActorRef) = dispatcher ! Subscribe(subscriber)
   override def unsubscribe(subscriber: ActorRef) = dispatcher ! Unsubscribe(subscriber)
+  override private[cat4s] def start() = dispatcher ! Process
+  override private[cat4s] def stop() = {}
 }

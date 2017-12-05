@@ -36,16 +36,26 @@ private[trace] class TraceDispatcher extends Actor with Stash {
   override def receive = initiating.orElse(terminated)
 
   private def initiating: Receive = {
-    case Process                                  => context become initiated.orElse(terminated)
-    case Subscribe(s) if !subscribers.contains(s) => subscribers = subscribers :+ context.watch(s)
-    case Unsubscribe(s)                           => subscribers = subscribers.filterNot(_ == context.unwatch(s))
-    case _                                        => stash()
+    case Process =>
+      context become initiated.orElse(terminated)
+      unstashAll()
+    case Subscribe(s) => if (!subscribers.contains(s)) {
+      subscribers = subscribers :+ context.watch(s)
+    }
+    case Unsubscribe(s) =>
+      subscribers = subscribers.filterNot(_ == context.unwatch(s))
+    case _ =>
+      stash()
   }
 
   private def initiated: Receive = {
-    case Subscribe(s) if !subscribers.contains(s) => subscribers = subscribers :+ context.watch(s)
-    case Unsubscribe(s)                           => subscribers = subscribers.filterNot(_ == context.unwatch(s))
-    case snapshot: TraceSnapshot                  => subscribers.foreach(_ ! snapshot)
+    case Subscribe(s) => if (!subscribers.contains(s)) {
+      subscribers = subscribers :+ context.watch(s)
+    }
+    case Unsubscribe(s) =>
+      subscribers = subscribers.filterNot(_ == context.unwatch(s))
+    case snapshot: TraceSnapshot =>
+      subscribers.foreach(_ ! snapshot)
   }
 
   private def terminated: Receive = {

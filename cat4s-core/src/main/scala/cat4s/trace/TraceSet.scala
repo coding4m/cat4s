@@ -30,4 +30,7 @@ trait TraceSet {
 
   def subscribe(subscriber: ActorRef): Unit
   def unsubscribe(subscriber: ActorRef): Unit
+
+  private[cat4s] def start(): Unit
+  private[cat4s] def stop(): Unit
 }

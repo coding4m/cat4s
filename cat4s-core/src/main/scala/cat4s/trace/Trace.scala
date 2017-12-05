@@ -68,7 +68,6 @@ object Trace {
         clock.elapsedNano,
         source.host,
         source.port,
-        source.name,
         _segments.map(it => SegmentSample(it.name, it.data, it.status.status, it.status.message, it.clock.startTime, it.clock.elapsedNano))
       )
     }

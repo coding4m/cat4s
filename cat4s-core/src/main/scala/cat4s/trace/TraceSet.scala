@@ -25,8 +25,11 @@ import scala.concurrent.{ ExecutionContext, Future }
  */
 trait TraceSet {
   def trace(name: String, source: TraceSource): Trace
+  def trace(name: String, host: String, port: Int): Trace = trace(name, TraceSource(host, port))
   def withContext[T](name: String, source: TraceSource)(f: TraceContext => T): T = trace(name, source).collect(f)
+  def withContext[T](name: String, host: String, port: Int)(f: TraceContext => T): T = withContext(name, TraceSource(host, port))(f)
   def withAsyncContext[T](name: String, source: TraceSource)(f: TraceContext => Future[T])(implicit ec: ExecutionContext): Future[T] = trace(name, source).collect(f)
+  def withAsyncContext[T](name: String, host: String, port: Int)(f: TraceContext => Future[T])(implicit ec: ExecutionContext): Future[T] = withAsyncContext(name, TraceSource(host, port))(f)
 
   def subscribe(subscriber: ActorRef): Unit
   def unsubscribe(subscriber: ActorRef): Unit

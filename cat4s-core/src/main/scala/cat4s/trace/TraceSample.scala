@@ -32,6 +32,5 @@ case class TraceSample(
   elapsedNano: Long,
   sourceHost: String,
   sourcePort: Int,
-  sourceName: Option[String],
   segments: Seq[SegmentSample]
 )

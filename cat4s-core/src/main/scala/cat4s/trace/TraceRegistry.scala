@@ -15,23 +15,18 @@
  */
 
 package cat4s.trace
-
-import scala.concurrent.{ ExecutionContext, Future }
+import akka.actor.{ ActorRef, ExtendedActorSystem, Extension }
 
 /**
  * @author siuming
  */
-class TraceRegistry {
+object TraceRegistry {
 
-  def newContext(name: String, source: TraceSource): Trace = {
-    new Trace(name, source)
-  }
-
-  def withContext[T](name: String, source: TraceSource)(f: TraceContext => T): T = {
-    newContext(name, source).collect(f)
-  }
-
-  def withContext[T](name: String, source: TraceSource)(f: TraceContext => Future[T])(implicit ec: ExecutionContext): Future[T] = {
-    newContext(name, source).collect(f)
-  }
+}
+class TraceRegistry(system: ExtendedActorSystem) extends Extension with TraceSet {
+  import TraceProtocol._
+  val dispatcher = system.actorOf(TraceDispatcher.props(), TraceDispatcher.Name)
+  override def trace(name: String, source: TraceSource): Trace = new Trace(name, source, dispatcher)
+  override def subscribe(subscriber: ActorRef) = dispatcher ! Subscribe(subscriber)
+  override def unsubscribe(subscriber: ActorRef) = dispatcher ! Unsubscribe(subscriber)
 }

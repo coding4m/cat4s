@@ -15,12 +15,17 @@
  */
 
 package cat4s.metric
+import akka.actor.{ ActorRef, ExtendedActorSystem, Extension }
 
 /**
  * @author siuming
  */
-class MetricRegistry {
-  def sample[T <: SampleRecorder](recorderFactory: SampleRecorderFactory[T], name: String): T = ???
-  def removeSample() = ???
-  def collect(ctx: InstrumentContext): MetricSnapshot = ???
+class MetricRegistry(system: ExtendedActorSystem) extends Extension with MetricSet {
+  private val settings = new MetricSettings(system.settings.config)
+
+  override private[cat4s] def start() = ???
+  override def collect(ctx: InstrumentContext) = ???
+  override def subscribe(subscriber: ActorRef, filter: SubscriptionFilter, permanently: Boolean) = ???
+  override def unsubscribe(subscriber: ActorRef) = ???
+  override private[cat4s] def stop() = ???
 }

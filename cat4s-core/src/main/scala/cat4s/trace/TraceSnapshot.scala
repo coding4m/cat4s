@@ -19,6 +19,6 @@ package cat4s.trace
 /**
  * @author siuming
  */
-class TraceSegmentInfo {
+class TraceSnapshot {
 
 }

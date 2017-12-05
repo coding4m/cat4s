@@ -16,9 +16,39 @@
 
 package cat4s.trace
 
+import akka.actor.{ Actor, ActorRef, Props, Stash, Terminated }
+
 /**
  * @author siuming
  */
-class TraceDispatcher {
+private[trace] object TraceDispatcher {
+  val Name = "trace-dispatcher"
+  def props(): Props =
+    Props(new TraceDispatcher)
 
+  private[trace] case object Process
+}
+private[trace] class TraceDispatcher extends Actor with Stash {
+  import TraceProtocol._
+  import TraceDispatcher._
+
+  private var subscribers = Seq.empty[ActorRef]
+  override def receive = initiating.orElse(terminated)
+
+  private def initiating: Receive = {
+    case Process                                  => context become initiated.orElse(terminated)
+    case Subscribe(s) if !subscribers.contains(s) => subscribers = subscribers :+ context.watch(s)
+    case Unsubscribe(s)                           => subscribers = subscribers.filterNot(_ == context.unwatch(s))
+    case _                                        => stash()
+  }
+
+  private def initiated: Receive = {
+    case Subscribe(s) if !subscribers.contains(s) => subscribers = subscribers :+ context.watch(s)
+    case Unsubscribe(s)                           => subscribers = subscribers.filterNot(_ == context.unwatch(s))
+    case snapshot: TraceSnapshot                  => subscribers.foreach(_ ! snapshot)
+  }
+
+  private def terminated: Receive = {
+    case Terminated(s) => subscribers = subscribers.filterNot(_ == s)
+  }
 }

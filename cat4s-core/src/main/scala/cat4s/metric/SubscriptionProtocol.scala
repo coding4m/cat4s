@@ -16,9 +16,12 @@
 
 package cat4s.metric
 
+import akka.actor.ActorRef
+
 /**
  * @author siuming
  */
-object SubscriptionProtocol {
-
+private[metric] object SubscriptionProtocol {
+  case class Subscribe(subscriber: ActorRef, filter: SubscriptionFilter, permanently: Boolean)
+  case class Unsubscribe(subscriber: ActorRef)
 }

@@ -18,6 +18,8 @@ package cat4s.trace
 
 import java.util.UUID
 
+import akka.actor.ActorRef
+
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ Failure, Success }
 
@@ -37,10 +39,11 @@ object Trace {
     tags: Seq[String],
     data: Map[String, String],
     source: TraceSource,
-    handler: TraceHandler) extends TraceContext {
+    handler: TraceHandler,
+    dispatcher: ActorRef) extends TraceContext {
     @volatile private var _status: TraceStatus = _
     @volatile private var _clock: TraceClock = TraceClock(startNano = System.nanoTime(), elapsedNano = -1L)
-    @volatile private var _segments: Seq[TraceSegment] = Seq.empty
+    @volatile private var _segments: Seq[Segment] = Seq.empty
     override val status = _status
     override val clock = _clock
     override def complete(status: TraceStatus) = {
@@ -48,15 +51,16 @@ object Trace {
       assert(_segments.forall(_.isCompleted), "segments must all completed.")
       this._status = status
       this._clock = this._clock.copy(elapsedNano = System.nanoTime() - this._clock.startNano)
+      dispatcher ! null //todo
     }
-    override def newSegment(name: String, data: Map[String, String]): TraceSegment = {
+    override def newSegment(name: String, data: Map[String, String]): Segment = {
       val segment = DefaultSegment(name, data, handler)
       this._segments = this._segments :+ segment
       segment
     }
   }
 
-  private case class DefaultSegment(name: String, data: Map[String, String], handler: TraceHandler) extends TraceSegment {
+  private case class DefaultSegment(name: String, data: Map[String, String], handler: TraceHandler) extends Segment {
     @volatile private var _status: TraceStatus = _
     @volatile private var _clock: TraceClock = TraceClock(startNano = System.nanoTime(), elapsedNano = -1L)
     override val status = _status
@@ -69,9 +73,9 @@ object Trace {
 
     override def collect[T](f: => T) = {
       try {
-        val result = f
+        val res = f
         complete(TraceStatus.OkStatus)
-        result
+        res
       } catch {
         case e: Throwable =>
           complete(handler.resolve(e))
@@ -79,7 +83,7 @@ object Trace {
       }
     }
 
-    override def collect[T](f: => Future[T])(implicit ec: ExecutionContext) = {
+    override def collectAsync[T](f: => Future[T])(implicit ec: ExecutionContext) = {
       f.andThen {
         case Success(_) => complete(TraceStatus.OkStatus)
         case Failure(e) => complete(handler.resolve(e))
@@ -87,7 +91,7 @@ object Trace {
     }
   }
 }
-class Trace private[trace] (name: String, source: TraceSource) {
+class Trace private[trace] (name: String, source: TraceSource, dispatcher: ActorRef) {
   import Trace._
 
   private var traceId: Option[String] = None
@@ -144,14 +148,12 @@ class Trace private[trace] (name: String, source: TraceSource) {
     this
   }
 
-  def apply[T](f: TraceContext => T): T = collect(f)
-
   def collect[T](f: TraceContext => T): T = {
     val ctx = buildContext()
     try {
-      val result = f(ctx)
+      val res = f(ctx)
       ctx.complete(TraceStatus.OkStatus)
-      result
+      res
     } catch {
       case e: Throwable =>
         ctx.complete(handler.resolve(e))
@@ -159,9 +161,7 @@ class Trace private[trace] (name: String, source: TraceSource) {
     }
   }
 
-  def apply[T](f: TraceContext => Future[T])(implicit ec: ExecutionContext): Future[T] = collect(f)
-
-  def collect[T](f: TraceContext => Future[T])(implicit ec: ExecutionContext): Future[T] = {
+  def collectAsync[T](f: TraceContext => Future[T])(implicit ec: ExecutionContext): Future[T] = {
     val ctx = buildContext()
     f(ctx).andThen {
       case Success(_) => ctx.complete(TraceStatus.OkStatus)
@@ -177,6 +177,7 @@ class Trace private[trace] (name: String, source: TraceSource) {
     tags,
     data,
     source,
-    handler
+    handler,
+    dispatcher
   )
 }

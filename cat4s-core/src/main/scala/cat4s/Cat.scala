@@ -16,9 +16,63 @@
 
 package cat4s
 
+import cat4s.metric.MetricRegistry
+import cat4s.trace.TraceRegistry
+
+import scala.concurrent.Future
+
 /**
  * @author siuming
  */
-class Cat {
+object Cat {
+  import scala.concurrent.ExecutionContext.Implicits._
+  val tracer = ???
+  val metrics = ???
+  def start(): Unit = {
+    val metrics = new MetricRegistry(null)
+    val tracer = new TraceRegistry(null)
+    metrics.start()
+    tracer.withContext("", null) { ctx =>
+      ctx.withSegment("") {
+        ???
+      }
 
+      ctx.withAsyncSegment("") {
+        ???
+      }
+      ???
+    }
+    tracer.withAsyncContext("", null) { ctx =>
+      ???
+    }
+    tracer
+      .trace("", null)
+      .withId(Some(""))
+      .withTag("")
+      .withData("", "")
+      .withData("name", "value")
+      .collect { ctx =>
+        ???
+      }
+
+    tracer
+      .trace("", null)
+      .withTraceId(Some(""))
+      .withId(Some(""))
+      .withTag("")
+      .withData("", "")
+      .collectAsync { ctx =>
+        ctx.withSegment("s0") {
+          "s0"
+        }
+        ctx.withAsyncSegment("s1") {
+          Future.successful("s1")
+        } flatMap { _ =>
+          ctx.withAsyncSegment("s2") {
+            Future.successful("s2")
+          }
+        }
+      }
+  }
+  def stop(): Unit = ???
 }

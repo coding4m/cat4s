@@ -14,15 +14,23 @@
  * limitations under the License.
  */
 
-package cat4s
+package cat4s.trace
 
-import cat4s.metric.MetricSnapshot
-import cat4s.trace.TraceSnapshot
+import scala.concurrent.{ ExecutionContext, Future }
 
 /**
  * @author siuming
  */
-trait Reporter {
-  def report(snapshot: TraceSnapshot): Unit = {}
-  def report(snapshot: MetricSnapshot): Unit = {}
+trait Segment {
+  def name: String
+  def data: Map[String, String]
+  def clock: TraceClock
+  def status: TraceStatus
+
+  def isSuccess: Boolean = isCompleted && status.status == TraceStatus.Ok
+  def isCompleted: Boolean = null != status
+  def complete(status: TraceStatus): Unit
+
+  def collect[T](f: => T): T
+  def collectAsync[T](f: => Future[T])(implicit ec: ExecutionContext): Future[T]
 }

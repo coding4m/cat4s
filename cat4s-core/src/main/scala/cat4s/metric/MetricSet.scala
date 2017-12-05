@@ -16,9 +16,17 @@
 
 package cat4s.metric
 
+import akka.actor.ActorRef
+
 /**
  * @author siuming
  */
 trait MetricSet {
-
+  private[cat4s] def start()
+  def sample[T <: SampleRecorder](recorderFactory: SampleRecorderFactory[T], name: String): T = ???
+  def removeSample() = ???
+  def collect(ctx: InstrumentContext): MetricSnapshot
+  def subscribe(subscriber: ActorRef, filter: SubscriptionFilter, permanently: Boolean): Unit
+  def unsubscribe(subscriber: ActorRef): Unit
+  private[cat4s] def stop()
 }

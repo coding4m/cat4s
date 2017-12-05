@@ -16,9 +16,11 @@
 
 package cat4s.metric
 
+import com.typesafe.config.Config
+
 /**
  * @author siuming
  */
-class MetricSettings {
+class MetricSettings(config: Config) {
 
 }

@@ -16,17 +16,18 @@
 
 package cat4s.trace
 
+import akka.actor.ActorRef
+
 import scala.concurrent.{ ExecutionContext, Future }
 
 /**
  * @author siuming
  */
 trait TraceSet {
+  def trace(name: String, source: TraceSource): Trace
+  def withContext[T](name: String, source: TraceSource)(f: TraceContext => T): T = trace(name, source).collect(f)
+  def withAsyncContext[T](name: String, source: TraceSource)(f: TraceContext => Future[T])(implicit ec: ExecutionContext): Future[T] = trace(name, source).collect(f)
 
-  def subscribe(): Unit
-  def unsubscribe(): Unit
-
-  def newContext(name: String, source: TraceSource): Trace
-  def withContext[T](name: String, source: TraceSource)(f: TraceContext => T): T = newContext(name, source).collect(f)
-  def withContext[T](name: String, source: TraceSource)(f: TraceContext => Future[T])(implicit ec: ExecutionContext): Future[T] = newContext(name, source).collect(f)
+  def subscribe(subscriber: ActorRef): Unit
+  def unsubscribe(subscriber: ActorRef): Unit
 }

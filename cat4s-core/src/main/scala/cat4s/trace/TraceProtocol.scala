@@ -16,11 +16,12 @@
 
 package cat4s.trace
 
+import akka.actor.ActorRef
+
 /**
  * @author siuming
  */
-object TraceProtocol {
-
-  private[trace] case class Subscribe()
-  private[trace] case class Unsubscribe()
+private[trace] object TraceProtocol {
+  case class Subscribe(subscriber: ActorRef)
+  case class Unsubscribe(subscriber: ActorRef)
 }

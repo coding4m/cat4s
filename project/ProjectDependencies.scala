@@ -21,6 +21,7 @@ object ProjectDependencyVersions {
   val LogbackVersion = "1.2.3"
   val Json4sVersion = "3.5.3"
   val FlumeVersion = "1.8.0"
+  val AkkaVersion = "2.5.4"
 }
 
 object ProjectDependencies {
@@ -42,5 +43,7 @@ object ProjectDependencies {
 
   val Disruptor = "com.lmax" % "disruptor" % DisruptorVersion
   val Flume =  "org.apache.flume" % "flume-ng-sdk" % FlumeVersion
+
+  val AkkaActor =            "com.typesafe.akka"         %% "akka-actor"                % AkkaVersion
 }
 

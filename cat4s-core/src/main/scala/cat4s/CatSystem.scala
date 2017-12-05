@@ -16,9 +16,19 @@
 
 package cat4s
 
+import akka.actor.{ ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider }
+
 /**
  * @author siuming
  */
-class CatSystem {
+object CatSystem extends ExtensionId[CatSystem] with ExtensionIdProvider {
+  override def lookup() = CatSystem
+  override def createExtension(system: ExtendedActorSystem) = new CatSystem(system)
+}
+class CatSystem(system: ExtendedActorSystem) extends Extension {
+  Cat.start()
+  system.registerOnTermination(Cat.stop())
 
+  val tracer = Cat.tracer
+  val metrics = Cat.metrics
 }

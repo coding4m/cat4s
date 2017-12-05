@@ -16,12 +16,25 @@
 
 package cat4s.metric
 
+import akka.actor.{ Actor, ActorRef }
+
 /**
  * @author siuming
  */
 object SubscriptionDispatcher {
   val Name = "metrics-dispatcher"
-}
-class SubscriptionDispatcher {
 
+  private[metric] case object Process
+}
+class SubscriptionDispatcher extends Actor {
+  private var subscribers = Seq.empty[ActorRef]
+  override def receive = initiating
+
+  private def initiating: Receive = {
+    ???
+  }
+
+  private def initiated: Receive = {
+    ???
+  }
 }

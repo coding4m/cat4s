@@ -16,13 +16,13 @@
 
 package cat4s
 
-import cat4s.metric.MetricSnapshot
-import cat4s.trace.TraceSnapshot
+import cat4s.metric.MetricSample
+import cat4s.trace.TraceSample
 
 /**
  * @author siuming
  */
 trait Reporter {
-  def report(snapshot: TraceSnapshot): Unit = {}
-  def report(snapshot: MetricSnapshot): Unit = {}
+  def report(sample: TraceSample): Unit = {}
+  def report(sample: MetricSample): Unit = {}
 }

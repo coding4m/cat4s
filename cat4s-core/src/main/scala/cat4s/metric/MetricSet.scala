@@ -25,7 +25,7 @@ trait MetricSet {
   private[cat4s] def start()
   def sample[T <: SampleRecorder](recorderFactory: SampleRecorderFactory[T], name: String): T = ???
   def removeSample() = ???
-  def collect(ctx: InstrumentContext): MetricSnapshot
+  def collect(ctx: InstrumentContext): MetricSample
   def subscribe(subscriber: ActorRef, filter: SubscriptionFilter, permanently: Boolean): Unit
   def unsubscribe(subscriber: ActorRef): Unit
   private[cat4s] def stop()

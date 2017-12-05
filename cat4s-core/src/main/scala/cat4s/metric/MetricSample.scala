@@ -14,24 +14,9 @@
  * limitations under the License.
  */
 
-package cat4s.trace
+package cat4s.metric
 
 /**
  * @author siuming
  */
-case class TraceSnapshot(
-  traceId: String,
-  parentId: Option[String],
-  id: String,
-  name: String,
-  tags: Seq[String],
-  data: Map[String, String],
-  status: Int,
-  message: String,
-  startTime: Long,
-  elapsedNano: Long,
-  sourceHost: String,
-  sourcePort: Int,
-  sourceName: Option[String],
-  segments: Seq[SegmentSnapshot]
-)
+case class MetricSample(metrics: Map[Sample, SampleSnapshot])

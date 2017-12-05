@@ -54,7 +54,7 @@ private[trace] class TraceDispatcher extends Actor with Stash {
     }
     case Unsubscribe(s) =>
       subscribers = subscribers.filterNot(_ == context.unwatch(s))
-    case snapshot: TraceSnapshot =>
+    case snapshot: TraceSample =>
       subscribers.foreach(_ ! snapshot)
   }
 

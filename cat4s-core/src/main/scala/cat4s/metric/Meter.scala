@@ -19,7 +19,7 @@ package cat4s.metric
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.{ AtomicLong, LongAdder }
 
-import com.codahale.metrics.{ Clock, EWMA }
+import codahale.metrics.{ Clock, EWMA }
 
 /**
  * @author siuming

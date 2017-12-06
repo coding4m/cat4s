@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-package cat4s
+package codahale.metrics;
 
-import com.typesafe.config.Config
+import java.util.Map;
 
 /**
- * @author siuming
+ * A set of named metrics.
+ *
+ * @see MetricRegistry#registerAll(MetricSet)
  */
-private[cat4s] class PluginSettings(config: Config) {
-
-  val enablePlugins =
-    config.getStringList("cat.enable-plugins")
-
-  val enableAllPlugins =
-    config.getBoolean("cat.enable-all-plugins")
-
-  val availablePlugins = {
-    config.atPath("cat.plugin")
-  }
+public interface MetricSet extends Metric {
+    /**
+     * A map of metric names to metrics.
+     *
+     * @return the metrics
+     */
+    Map<String, Metric> getMetrics();
 }

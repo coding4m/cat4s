@@ -16,7 +16,7 @@
 
 package cat4s.metric
 
-import com.codahale.metrics.Reservoir
+import codahale.metrics.Reservoir
 
 /**
  * @author siuming

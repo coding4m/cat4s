@@ -34,15 +34,14 @@ object TraceTest extends App {
         Cat.stop()
         System.exit(0)
       case "record" =>
-        Cat.tracer
-          .trace("t0", "127.0.0.1", 443) { ctx =>
-            ctx.withSegment("s0") {
-            }
-            ctx.withSegment("s1") {
-            }
-            ctx.withSegment("s2") {
-            }
+        Cat.tracer.trace("t0", "127.0.0.1", 443) { ctx =>
+          ctx.withSegment("s0") {
           }
+          ctx.withSegment("s1") {
+          }
+          ctx.withSegment("s2") {
+          }
+        }
         prompt()
       case _ =>
         prompt()

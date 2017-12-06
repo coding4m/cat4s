@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package cat4s
-
-import com.typesafe.config.Config
+package codahale.metrics;
 
 /**
- * @author siuming
+ * An interface for metric types which have counts.
  */
-private[cat4s] class PluginSettings(config: Config) {
-
-  val enablePlugins =
-    config.getStringList("cat.enable-plugins")
-
-  val enableAllPlugins =
-    config.getBoolean("cat.enable-all-plugins")
-
-  val availablePlugins = {
-    config.atPath("cat.plugin")
-  }
+public interface Counting {
+    /**
+     * Returns the current count.
+     *
+     * @return the current count
+     */
+    long getCount();
 }

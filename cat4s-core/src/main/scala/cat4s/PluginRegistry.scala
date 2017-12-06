@@ -16,20 +16,14 @@
 
 package cat4s
 
-import com.typesafe.config.Config
+import akka.actor.{ ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider }
 
 /**
  * @author siuming
  */
-private[cat4s] class PluginSettings(config: Config) {
-
-  val enablePlugins =
-    config.getStringList("cat.enable-plugins")
-
-  val enableAllPlugins =
-    config.getBoolean("cat.enable-all-plugins")
-
-  val availablePlugins = {
-    config.atPath("cat.plugin")
-  }
+object PluginRegistry extends ExtensionId[PluginRegistry] with ExtensionIdProvider {
+  override def lookup() = PluginRegistry
+  override def createExtension(system: ExtendedActorSystem) = new PluginRegistry(system)
+}
+class PluginRegistry(system: ExtendedActorSystem) extends Extension {
 }

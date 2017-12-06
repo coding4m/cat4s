@@ -55,6 +55,7 @@ private[trace] class SubscriptionController extends Actor with Stash {
     case Unsubscribe(s) =>
       subscribers = subscribers.filterNot(_ == context.unwatch(s))
     case sample: TraceSample =>
+      println(sample)
       subscribers.foreach(_ ! sample)
   }
 

@@ -17,7 +17,7 @@
 package cat4s.metric
 
 import akka.actor.ActorRef
-import com.codahale.metrics.Reservoir
+import codahale.metrics.Reservoir
 
 /**
  * @author siuming

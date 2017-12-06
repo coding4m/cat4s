@@ -14,22 +14,11 @@
  * limitations under the License.
  */
 
-package cat4s
+package codahale.metrics;
 
-import com.typesafe.config.Config
-
-/**
- * @author siuming
+/*
+ * A tag interface to indicate that a class is a Reporter.
  */
-private[cat4s] class PluginSettings(config: Config) {
+public interface Reporter {
 
-  val enablePlugins =
-    config.getStringList("cat.enable-plugins")
-
-  val enableAllPlugins =
-    config.getBoolean("cat.enable-all-plugins")
-
-  val availablePlugins = {
-    config.atPath("cat.plugin")
-  }
 }

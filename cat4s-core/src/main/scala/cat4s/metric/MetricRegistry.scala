@@ -16,7 +16,7 @@
 
 package cat4s.metric
 import akka.actor.{ ActorRef, Cancellable, ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider }
-import com.codahale.metrics.Reservoir
+import codahale.metrics.Reservoir
 
 import scala.collection.concurrent.TrieMap
 

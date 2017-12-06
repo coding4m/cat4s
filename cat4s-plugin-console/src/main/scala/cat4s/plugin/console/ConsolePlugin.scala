@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 
-package cat4s
+package cat4s.plugin.console
 
-import com.typesafe.config.Config
+import akka.actor.{ ExtendedActorSystem, ExtensionId, ExtensionIdProvider }
+import cat4s.{ Cat, Plugin }
 
 /**
  * @author siuming
  */
-private[cat4s] class PluginSettings(config: Config) {
-
-  val enablePlugins =
-    config.getStringList("cat.enable-plugins")
-
-  val enableAllPlugins =
-    config.getBoolean("cat.enable-all-plugins")
-
-  val availablePlugins = {
-    config.atPath("cat.plugin")
-  }
+object ConsolePlugin extends ExtensionId[ConsolePlugin] with ExtensionIdProvider {
+  override def lookup() = ConsolePlugin
+  override def createExtension(system: ExtendedActorSystem) = new ConsolePlugin(system)
+}
+class ConsolePlugin(system: ExtendedActorSystem) extends Plugin {
+  Cat.tracer.subscribe(null)
+  Cat.metrics.subscribe(null, null, permanently = true)
 }

@@ -16,8 +16,30 @@
 
 package cat4s.japi;
 
+import cat4s.Cat$;
+import cat4s.trace.TraceSet;
+import cat4s.metric.MetricSet;
+
 /**
  * @author siuming
  */
-public class Cat {
+public final class Cat {
+
+    public static void start() {
+        Cat$.MODULE$.start();
+    }
+
+    public static TraceSet tracer() {
+        return Cat$.MODULE$.tracer();
+    }
+
+    public static MetricSet metrics() {
+        return Cat$.MODULE$.metrics();
+    }
+
+    public static void stop() {
+        Cat$.MODULE$.stop();
+    }
+
+    private Cat(){}
 }

@@ -14,22 +14,11 @@
  * limitations under the License.
  */
 
-package cat4s
-
-import com.typesafe.config.Config
+package codahale.metrics;
 
 /**
- * @author siuming
+ * A tag interface to indicate that a class is a metric.
  */
-private[cat4s] class PluginSettings(config: Config) {
+public interface Metric {
 
-  val enablePlugins =
-    config.getStringList("cat.enable-plugins")
-
-  val enableAllPlugins =
-    config.getBoolean("cat.enable-all-plugins")
-
-  val availablePlugins = {
-    config.atPath("cat.plugin")
-  }
 }

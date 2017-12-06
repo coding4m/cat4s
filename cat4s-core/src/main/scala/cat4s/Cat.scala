@@ -66,8 +66,7 @@ object Cat {
       actorSystem = ActorSystem(Name, config.withOnlyPath(Name))
       tracer = actorSystem.registerExtension(TraceRegistry)
       metrics = actorSystem.registerExtension(MetricRegistry)
-      actorSystem.registerExtension(PluginLoader)
-      actorSystem.registerExtension(ReporterLoader)
+      actorSystem.registerExtension(PluginRegistry)
       tracer.start()
       metrics.start()
       started = true

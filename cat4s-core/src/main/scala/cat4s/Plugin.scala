@@ -16,7 +16,9 @@
 
 package cat4s
 
+import akka.actor.Extension
+
 /**
  * @author siuming
  */
-trait Plugin extends CatModule
+trait Plugin extends Extension

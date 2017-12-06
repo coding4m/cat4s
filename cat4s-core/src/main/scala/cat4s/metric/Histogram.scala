@@ -16,7 +16,7 @@
 
 package cat4s.metric
 
-import com.codahale.metrics.{ ExponentiallyDecayingReservoir, Reservoir }
+import codahale.metrics.{ ExponentiallyDecayingReservoir, Reservoir }
 
 /**
  * @author siuming

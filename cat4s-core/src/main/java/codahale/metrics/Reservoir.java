@@ -14,22 +14,30 @@
  * limitations under the License.
  */
 
-package cat4s
-
-import com.typesafe.config.Config
+package codahale.metrics;
 
 /**
- * @author siuming
+ * A statistically representative reservoir of a data stream.
  */
-private[cat4s] class PluginSettings(config: Config) {
+public interface Reservoir {
+    /**
+     * Returns the number of values recorded.
+     *
+     * @return the number of values recorded
+     */
+    int size();
 
-  val enablePlugins =
-    config.getStringList("cat.enable-plugins")
+    /**
+     * Adds a new recorded value to the reservoir.
+     *
+     * @param value a new recorded value
+     */
+    void update(long value);
 
-  val enableAllPlugins =
-    config.getBoolean("cat.enable-all-plugins")
-
-  val availablePlugins = {
-    config.atPath("cat.plugin")
-  }
+    /**
+     * Returns a snapshot of the reservoir's values.
+     *
+     * @return a snapshot of the reservoir's values
+     */
+    Snapshot getSnapshot();
 }

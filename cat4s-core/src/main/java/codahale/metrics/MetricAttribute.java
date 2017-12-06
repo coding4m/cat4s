@@ -14,22 +14,36 @@
  * limitations under the License.
  */
 
-package cat4s
-
-import com.typesafe.config.Config
+package codahale.metrics;
 
 /**
- * @author siuming
+ * Represents attributes of metrics which can be reported.
  */
-private[cat4s] class PluginSettings(config: Config) {
+public enum MetricAttribute {
 
-  val enablePlugins =
-    config.getStringList("cat.enable-plugins")
+    MAX("max"),
+    MEAN("mean"),
+    MIN("min"),
+    STDDEV("stddev"),
+    P50("p50"),
+    P75("p75"),
+    P95("p95"),
+    P98("p98"),
+    P99("p99"),
+    P999("p999"),
+    COUNT("count"),
+    M1_RATE("m1_rate"),
+    M5_RATE("m5_rate"),
+    M15_RATE("m15_rate"),
+    MEAN_RATE("mean_rate");
 
-  val enableAllPlugins =
-    config.getBoolean("cat.enable-all-plugins")
+    private final String code;
 
-  val availablePlugins = {
-    config.atPath("cat.plugin")
-  }
+    MetricAttribute(String code) {
+        this.code = code;
+    }
+
+    public String getCode() {
+        return code;
+    }
 }

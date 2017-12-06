@@ -21,16 +21,16 @@ import akka.actor.{ Actor, ActorRef, Props, Stash, Terminated }
 /**
  * @author siuming
  */
-private[trace] object TraceDispatcher {
-  val Name = "trace-dispatcher"
+private[trace] object SubscriptionController {
+  val Name = "trace-subscription-controller"
   def props(): Props =
-    Props(new TraceDispatcher)
+    Props(new SubscriptionController)
 
-  private[trace] case object Process
+  case object Process
 }
-private[trace] class TraceDispatcher extends Actor with Stash {
-  import TraceProtocol._
-  import TraceDispatcher._
+private[trace] class SubscriptionController extends Actor with Stash {
+  import SubscriptionProtocol._
+  import SubscriptionController._
 
   private var subscribers = Seq.empty[ActorRef]
   override def receive = initiating.orElse(terminated)

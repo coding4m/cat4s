@@ -19,6 +19,4 @@ package cat4s
 /**
  * @author siuming
  */
-trait Plugin {
-
-}
+trait Plugin extends CatModule

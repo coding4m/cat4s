@@ -22,6 +22,6 @@ import akka.actor.ActorRef
  * @author siuming
  */
 private[metric] object SubscriptionProtocol {
-  case class Subscribe(subscriber: ActorRef, filter: SubscriptionFilter, permanently: Boolean)
+  case class Subscribe(subscriber: ActorRef, filter: MetricFilter, permanently: Boolean)
   case class Unsubscribe(subscriber: ActorRef)
 }

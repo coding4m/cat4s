@@ -16,9 +16,14 @@
 
 package cat4s
 
+import akka.actor.{ ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider }
+
 /**
  * @author siuming
  */
-class ReporterLoader {
-
+object ReporterLoader extends ExtensionId[ReporterLoader] with ExtensionIdProvider {
+  override def lookup() = ReporterLoader
+  override def createExtension(system: ExtendedActorSystem) = new ReporterLoader(system)
+}
+class ReporterLoader(system: ExtendedActorSystem) extends Extension {
 }

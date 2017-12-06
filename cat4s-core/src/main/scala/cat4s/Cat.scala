@@ -16,64 +16,67 @@
 
 package cat4s
 
-import cat4s.metric.MetricRegistry
-import cat4s.trace.TraceRegistry
-
-import scala.concurrent.Future
+import akka.actor.ActorSystem
+import cat4s.metric.{ MetricRegistry, MetricSet }
+import cat4s.trace.{ TraceRegistry, TraceSet }
+import com.typesafe.config.{ Config, ConfigFactory }
 
 /**
  * @author siuming
  */
 object Cat {
-  import scala.concurrent.ExecutionContext.Implicits._
-  val tracer = ???
-  val metrics = ???
-  def start(): Unit = {
-    val metrics = new MetricRegistry(null)
-    val tracer = new TraceRegistry(null)
-    metrics.start()
-    tracer.withContext("", null) { ctx =>
-      ctx.withSegment("") {
-        ???
-      }
 
-      ctx.withAsyncSegment("") {
-        ???
-      }
-      ???
-    }
-    tracer.withAsyncContext("", null) { ctx =>
-      ???
-    }
-    tracer
-      .trace("", null)
-      .withId(Some(""))
-      .withTag("")
-      .withData("", "")
-      .withData("name", "value")
-      .collect { ctx =>
-        ???
-      }
+  @volatile private var instance = new Instance()
 
-    tracer
-      .trace("", null)
-      .withTraceId(Some(""))
-      .withParentId(None)
-      .withId(Some(""))
-      .withTag("")
-      .withData("", "")
-      .collectAsync { ctx =>
-        ctx.withSegment("s0") {
-          "s0"
-        }
-        ctx.withAsyncSegment("s1") {
-          Future.successful("s1")
-        } flatMap { _ =>
-          ctx.withAsyncSegment("s2") {
-            Future.successful("s2")
-          }
-        }
-      }
+  def tracer: TraceSet = {
+    val _tracer = instance.tracer
+    if (null == _tracer) throw new CatException("cat must been started.") else _tracer
   }
-  def stop(): Unit = ???
+
+  def metrics: MetricSet = {
+    val _metrics = instance.metrics
+    if (null == _metrics) throw new CatException("cat must been started.") else _metrics
+  }
+
+  def start(): Unit = {
+    instance.start()
+  }
+
+  def start(config: Config): Unit = {
+    instance.start(config)
+  }
+
+  def stop(): Unit = {
+    instance.stop()
+    instance = new Instance()
+  }
+
+  private class Instance {
+    var actorSystem: ActorSystem = _
+    var tracer: TraceSet = _
+    var metrics: MetricSet = _
+    var started = false
+
+    def start(): Unit = {
+      start(ConfigFactory.load())
+    }
+
+    def start(config: Config): Unit = this.synchronized {
+      actorSystem = ActorSystem("cat", config.withOnlyPath("cat"))
+      tracer = actorSystem.registerExtension(TraceRegistry)
+      metrics = actorSystem.registerExtension(MetricRegistry)
+      actorSystem.registerExtension(PluginLoader)
+      actorSystem.registerExtension(ReporterLoader)
+      tracer.start()
+      metrics.start()
+      started = true
+    }
+
+    def stop(): Unit = this.synchronized {
+      if (started) {
+        started = false
+        actorSystem.terminate()
+      }
+    }
+  }
 }

@@ -16,13 +16,7 @@
 
 package cat4s
 
-import cat4s.metric.MetricSample
-import cat4s.trace.TraceSample
-
 /**
  * @author siuming
  */
-trait Reporter extends CatModule {
-  def report(sample: TraceSample): Unit = {}
-  def report(sample: MetricSample): Unit = {}
-}
+class CatException(msg: String) extends RuntimeException(msg)

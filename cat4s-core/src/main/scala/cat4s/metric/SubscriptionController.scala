@@ -16,8 +16,26 @@
 
 package cat4s.metric
 
+import akka.actor.{ Actor, ActorRef, Props }
+
 /**
  * @author siuming
  */
-trait SubscriptionFilter {
+private[metric] object SubscriptionController {
+  val Name = "metrics-subscription-controller"
+  def props(): Props =
+    Props(new SubscriptionController)
+  case object Process
+}
+private[metric] class SubscriptionController extends Actor {
+  private var subscribers = Seq.empty[ActorRef]
+  override def receive = initiating
+
+  private def initiating: Receive = {
+    ???
+  }
+
+  private def initiated: Receive = {
+    ???
+  }
 }

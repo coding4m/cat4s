@@ -25,9 +25,9 @@ object TraceRegistry extends ExtensionId[TraceRegistry] with ExtensionIdProvider
   override def createExtension(system: ExtendedActorSystem) = new TraceRegistry(system)
 }
 class TraceRegistry(system: ExtendedActorSystem) extends Extension with TraceSet {
-  import TraceProtocol._
-  import TraceDispatcher._
-  val dispatcher = system.actorOf(TraceDispatcher.props(), TraceDispatcher.Name)
+  import SubscriptionProtocol._
+  import SubscriptionController._
+  private val dispatcher = system.actorOf(SubscriptionController.props(), SubscriptionController.Name)
   override def trace(name: String, source: TraceSource): Trace = new Trace(name, source, dispatcher)
   override def subscribe(subscriber: ActorRef) = dispatcher ! Subscribe(subscriber)
   override def unsubscribe(subscriber: ActorRef) = dispatcher ! Unsubscribe(subscriber)

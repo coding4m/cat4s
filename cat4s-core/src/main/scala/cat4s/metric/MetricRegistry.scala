@@ -15,17 +15,37 @@
  */
 
 package cat4s.metric
-import akka.actor.{ ActorRef, ExtendedActorSystem, Extension }
+import akka.actor.{ ActorRef, Cancellable, ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider }
 
 /**
  * @author siuming
  */
+object MetricRegistry extends ExtensionId[MetricRegistry] with ExtensionIdProvider {
+  override def lookup() = MetricRegistry
+  override def createExtension(system: ExtendedActorSystem) = new MetricRegistry(system)
+}
 class MetricRegistry(system: ExtendedActorSystem) extends Extension with MetricSet {
-  private val settings = new MetricSettings(system.settings.config)
+  import SubscriptionProtocol._
+  import SubscriptionController._
 
-  override def collect(ctx: InstrumentContext) = ???
-  override def subscribe(subscriber: ActorRef, filter: SubscriptionFilter, permanently: Boolean) = ???
-  override def unsubscribe(subscriber: ActorRef) = ???
-  override private[cat4s] def start() = ???
-  override private[cat4s] def stop() = ???
+  private val settings = new MetricSettings(system.settings.config)
+  private val controller = system.actorOf(SubscriptionController.props(), SubscriptionController.Name)
+
+  @volatile private var scheduler: Option[Cancellable] = None
+
+  override def subscribe(subscriber: ActorRef, filter: MetricFilter, permanently: Boolean) = controller ! Subscribe(subscriber, filter, permanently)
+  override def unsubscribe(subscriber: ActorRef) = controller ! Unsubscribe(subscriber)
+
+  override private[cat4s] def start() = {
+    import system.dispatcher
+    //todo
+    scheduler.foreach(_.cancel())
+    scheduler = Some(system.scheduler.schedule(null, null) {
+      //collect
+      controller ! MetricSample(Map.empty)
+    })
+
+    controller ! Process
+  }
+  override private[cat4s] def stop() = scheduler.foreach(_.cancel())
 }

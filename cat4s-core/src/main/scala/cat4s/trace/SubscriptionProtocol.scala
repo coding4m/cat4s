@@ -21,7 +21,7 @@ import akka.actor.ActorRef
 /**
  * @author siuming
  */
-private[trace] object TraceProtocol {
+private[trace] object SubscriptionProtocol {
   case class Subscribe(subscriber: ActorRef)
   case class Unsubscribe(subscriber: ActorRef)
 }

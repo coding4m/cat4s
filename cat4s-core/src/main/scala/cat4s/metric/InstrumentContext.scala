@@ -16,9 +16,16 @@
 
 package cat4s.metric
 
+import java.nio.LongBuffer
+
 /**
  * @author siuming
  */
-class InstrumentContext {
-
+object InstrumentContext {
+  def apply(bufferSize: Int): InstrumentContext = new InstrumentContext() {
+    override def buffer = LongBuffer.allocate(bufferSize)
+  }
+}
+trait InstrumentContext {
+  def buffer: LongBuffer
 }

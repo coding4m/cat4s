@@ -16,11 +16,19 @@
 
 package cat4s.metric
 
+import java.util.concurrent.TimeUnit
+
 import com.typesafe.config.Config
+import scala.concurrent.duration._
 
 /**
  * @author siuming
  */
 class MetricSettings(config: Config) {
 
+  val collectInterval =
+    config.getDuration("cat.metrics.collect-interval", TimeUnit.MILLISECONDS).millis
+
+  val collectBufferSize =
+    config.getInt("cat.metrics.collect-buffer-size")
 }

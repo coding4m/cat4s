@@ -16,27 +16,14 @@
 
 package cat4s.metric
 
-import akka.actor.{ Actor, ActorRef, Props }
-
 /**
  * @author siuming
  */
-private[metric] object SubscriptionController {
-  val Name = "metrics-subscription-controller"
-  def props(): Props =
-    Props(new SubscriptionController)
-  case object Process
-}
-private[metric] class SubscriptionController extends Actor {
-  private var subscribers = Seq.empty[ActorRef]
-  override def receive = initiating
-
-  private def initiating: Receive = {
-    //todo
-    case msg => println(msg)
-  }
-
-  private def initiated: Receive = {
-    ???
-  }
+object InstrumentCatelog {
+  val Counter = "counter"
+  val MinMaxCounter = "min-max-counter"
+  val Gauge = "gauge"
+  val Meter = "meter"
+  val Timer = "timer"
+  val Histogram = "histogram"
 }

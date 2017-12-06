@@ -14,29 +14,38 @@
  * limitations under the License.
  */
 
-package cat4s.metric
+package cat4s
 
-import akka.actor.{ Actor, ActorRef, Props }
+import scala.io.Source
+import scala.util.Random
 
 /**
  * @author siuming
  */
-private[metric] object SubscriptionController {
-  val Name = "metrics-subscription-controller"
-  def props(): Props =
-    Props(new SubscriptionController)
-  case object Process
-}
-private[metric] class SubscriptionController extends Actor {
-  private var subscribers = Seq.empty[ActorRef]
-  override def receive = initiating
+object TraceTest extends App {
+  val lines = Source.stdin.getLines
 
-  private def initiating: Receive = {
-    //todo
-    case msg => println(msg)
-  }
+  Cat.start()
+  prompt()
 
-  private def initiated: Receive = {
-    ???
+  private def prompt(): Unit = {
+    if (lines.hasNext) lines.next() match {
+      case "exit" =>
+        Cat.stop()
+        System.exit(0)
+      case "record" =>
+        Cat.tracer
+          .trace("t0", "127.0.0.1", 443) { ctx =>
+            ctx.withSegment("s0") {
+            }
+            ctx.withSegment("s1") {
+            }
+            ctx.withSegment("s2") {
+            }
+          }
+        prompt()
+      case _ =>
+        prompt()
+    }
   }
 }

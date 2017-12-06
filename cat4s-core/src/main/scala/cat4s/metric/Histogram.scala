@@ -21,7 +21,7 @@ import com.codahale.metrics.{ ExponentiallyDecayingReservoir, Reservoir }
 /**
  * @author siuming
  */
-private[metric] object Histogram {
+object Histogram {
   val DefaultReservoir = new ExponentiallyDecayingReservoir()
   val DefaultPercentiles = Array(1L, 5L, 10L, 90L, 95L, 99L)
 }
@@ -31,7 +31,7 @@ class Histogram(percentiles: Array[Long], reservoir: Reservoir) extends Instrume
 
   override type Record = Long
   override type Snapshot = HistogramSnapshot
-  override def record(value: Long) = reservoir.update(value)
+  override def record(value: Long): Unit = reservoir.update(value)
   override def collect(ctx: InstrumentContext) = {
     val snapshot = reservoir.getSnapshot
     HistogramSnapshot(
@@ -42,5 +42,5 @@ class Histogram(percentiles: Array[Long], reservoir: Reservoir) extends Instrume
       percentiles = percentiles.map(it => s"p$it" -> snapshot.getValue((it.toDouble / 100).formatted("%.2f").toDouble)).toMap
     )
   }
-  override def cleanup() = {}
+  override def cleanup(): Unit = {}
 }

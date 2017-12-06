@@ -33,7 +33,7 @@ class MinMaxCounter(resetAfterCollect: Boolean) extends Instrument {
 
   override type Record = Long
   override type Snapshot = MinMaxCounterSnapshot
-  override def record(value: Long) = {
+  override def record(value: Long): Unit = {
     count.add(value)
     if (value < 0) {
       min.accumulate(count.sum())

@@ -21,13 +21,18 @@ import com.codahale.metrics.Reservoir
 /**
  * @author siuming
  */
+object Timer {
+  val DefaultRates = Meter.DefaultRates
+  val DefaultReservoir = Histogram.DefaultReservoir
+  val DefaultPercentiles = Histogram.DefaultPercentiles
+}
 class Timer(rates: Array[Long], percentiles: Array[Long], reservoir: Reservoir) extends Instrument {
   private val meter = new Meter(rates)
   private val histogram = new Histogram(percentiles, reservoir)
 
   override type Record = Long
   override type Snapshot = TimerSnapshot
-  override def record(value: Long) = {
+  override def record(value: Long): Unit = {
     if (value >= 0) {
       meter.record(value)
       histogram.record(value)

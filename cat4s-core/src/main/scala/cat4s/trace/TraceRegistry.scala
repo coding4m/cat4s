@@ -29,8 +29,8 @@ class TraceRegistry(system: ExtendedActorSystem) extends Extension with TraceSet
   import SubscriptionController._
   private val dispatcher = system.actorOf(SubscriptionController.props(), SubscriptionController.Name)
   override def trace(name: String, source: TraceSource): Trace = new Trace(name, source, dispatcher)
-  override def subscribe(subscriber: ActorRef) = dispatcher ! Subscribe(subscriber)
-  override def unsubscribe(subscriber: ActorRef) = dispatcher ! Unsubscribe(subscriber)
-  override private[cat4s] def start() = dispatcher ! Process
-  override private[cat4s] def stop() = {}
+  override def subscribe(subscriber: ActorRef): Unit = dispatcher ! Subscribe(subscriber)
+  override def unsubscribe(subscriber: ActorRef): Unit = dispatcher ! Unsubscribe(subscriber)
+  override private[cat4s] def start(): Unit = dispatcher ! Process
+  override private[cat4s] def stop(): Unit = {}
 }

@@ -39,7 +39,7 @@ trait TraceContext {
   def newSegment(name: String): Segment = newSegment(name, Map.empty[String, String])
   def newSegment(name: String, data: Map[String, String]): Segment
   def withSegment[T](name: String)(f: => T): T = withSegment(name, Map.empty)(f)
-  def withSegment[T](name: String, data: Map[String, String])(f: => T): T = newSegment(name, data).collect(f)
+  def withSegment[T](name: String, data: Map[String, String])(f: => T): T = newSegment(name, data)(f)
   def withAsyncSegment[T](name: String)(f: => Future[T])(implicit ec: ExecutionContext): Future[T] = withAsyncSegment(name, Map.empty)(f)
-  def withAsyncSegment[T](name: String, data: Map[String, String])(f: => Future[T])(implicit ec: ExecutionContext): Future[T] = newSegment(name, data).collect(f)
+  def withAsyncSegment[T](name: String, data: Map[String, String])(f: => Future[T])(implicit ec: ExecutionContext): Future[T] = newSegment(name, data)(f)
 }

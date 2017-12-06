@@ -16,9 +16,13 @@
 
 package cat4s
 
+import com.typesafe.config.Config
+
 /**
  * @author siuming
  */
-private[cat4s] class ReporterSettings {
+private[cat4s] class ReporterSettings(config: Config) {
 
+  val reporters =
+    config.getStringList("cat.reporters")
 }

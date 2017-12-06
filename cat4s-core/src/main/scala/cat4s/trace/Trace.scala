@@ -48,9 +48,9 @@ object Trace {
     @volatile private var _segments: Seq[Segment] = Seq.empty
     @volatile private var _clock: TraceClock = TraceClock(startTime = startTime, elapsedNano = 0L)
 
-    override val status = _status
-    override val clock = _clock
-    override def complete(status: TraceStatus) = {
+    @inline override def status = _status
+    @inline override def clock = _clock
+    override def complete(status: TraceStatus): Unit = {
       assert(!isCompleted, "context has been completed.")
       assert(_segments.forall(_.isCompleted), "segments must all completed.")
       this._status = status
@@ -84,15 +84,15 @@ object Trace {
 
     @volatile private var _status: TraceStatus = _
     @volatile private var _clock: TraceClock = TraceClock(startTime = startTime, elapsedNano = -1L)
-    override val status = _status
-    override val clock = _clock
-    override def complete(status: TraceStatus) = {
+    @inline override def status = _status
+    @inline override def clock = _clock
+    override def complete(status: TraceStatus): Unit = {
       assert(!isCompleted, "segment has been completed.")
       this._status = status
       this._clock = this._clock.copy(elapsedNano = System.nanoTime() - startNano)
     }
 
-    override def collect[T](f: => T) = {
+    override def apply[T](f: => T) = {
       try {
         val res = f
         complete(TraceStatus.OkStatus)
@@ -104,7 +104,7 @@ object Trace {
       }
     }
 
-    override def collectAsync[T](f: => Future[T])(implicit ec: ExecutionContext) = {
+    override def collect[T](f: => Future[T])(implicit ec: ExecutionContext) = {
       f.andThen {
         case Success(_) => complete(TraceStatus.OkStatus)
         case Failure(e) => complete(handler.resolve(e))
@@ -169,7 +169,7 @@ class Trace private[trace] (name: String, source: TraceSource, dispatcher: Actor
     this
   }
 
-  def collect[T](f: TraceContext => T): T = {
+  def apply[T](f: TraceContext => T): T = {
     val ctx = buildContext()
     try {
       val res = f(ctx)
@@ -182,7 +182,7 @@ class Trace private[trace] (name: String, source: TraceSource, dispatcher: Actor
     }
   }
 
-  def collectAsync[T](f: TraceContext => Future[T])(implicit ec: ExecutionContext): Future[T] = {
+  def collect[T](f: TraceContext => Future[T])(implicit ec: ExecutionContext): Future[T] = {
     val ctx = buildContext()
     f(ctx).andThen {
       case Success(_) => ctx.complete(TraceStatus.OkStatus)

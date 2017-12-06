@@ -24,27 +24,41 @@ import com.codahale.metrics.Reservoir
  */
 trait MetricSet {
 
+  def counter(name: String, unit: InstrumentUnit): Counter = counter(name, unit, resetAfterCollect = false)
   def counter(name: String, unit: InstrumentUnit, resetAfterCollect: Boolean): Counter = counter(name, unit, resetAfterCollect, Seq.empty)
   def counter(name: String, unit: InstrumentUnit, resetAfterCollect: Boolean, tags: Seq[String]): Counter = registerCounter(name, unit, resetAfterCollect, tags)
   def registerCounter(name: String, unit: InstrumentUnit, resetAfterCollect: Boolean, tags: Seq[String]): Counter
   def unregisterCounter(name: String, tags: Seq[String]): Boolean
 
+  def minMaxCounter(name: String, unit: InstrumentUnit): MinMaxCounter = minMaxCounter(name, unit, resetAfterCollect = false)
+  def minMaxCounter(name: String, unit: InstrumentUnit, resetAfterCollect: Boolean): MinMaxCounter = minMaxCounter(name, unit, resetAfterCollect, Seq.empty)
   def minMaxCounter(name: String, unit: InstrumentUnit, resetAfterCollect: Boolean, tags: Seq[String]): MinMaxCounter = registerMinMaxCounter(name, unit, resetAfterCollect, tags)
   def registerMinMaxCounter(name: String, unit: InstrumentUnit, resetAfterCollect: Boolean, tags: Seq[String]): MinMaxCounter
   def unregisterMinMaxCounter(name: String, tags: Seq[String]): Boolean
 
+  def gauge(name: String, unit: InstrumentUnit, identity: Any): Gauge = gauge(name, unit, identity, resetAfterCollect = false)
+  def gauge(name: String, unit: InstrumentUnit, identity: Any, resetAfterCollect: Boolean): Gauge = gauge(name, unit, identity, resetAfterCollect, Seq.empty)
   def gauge(name: String, unit: InstrumentUnit, identity: Any, resetAfterCollect: Boolean, tags: Seq[String]): Gauge = registerGauge(name, unit, identity, resetAfterCollect, tags)
   def registerGauge(name: String, unit: InstrumentUnit, identity: Any, resetAfterCollect: Boolean, tags: Seq[String]): Gauge
   def unregisterGauge(name: String, tags: Seq[String]): Boolean
 
+  def meter(name: String, unit: InstrumentUnit): Meter = meter(name, unit, Meter.DefaultRates)
+  def meter(name: String, unit: InstrumentUnit, rates: Array[Long]): Meter = meter(name, unit, rates, Seq.empty)
   def meter(name: String, unit: InstrumentUnit, rates: Array[Long], tags: Seq[String]): Meter = registerMeter(name, unit, rates, tags)
   def registerMeter(name: String, unit: InstrumentUnit, rates: Array[Long], tags: Seq[String]): Meter
   def unregisterMeter(name: String, tags: Seq[String]): Boolean
 
+  def timer(name: String, unit: InstrumentUnit): Timer = timer(name, unit, Timer.DefaultRates)
+  def timer(name: String, unit: InstrumentUnit, rates: Array[Long]): Timer = timer(name, unit, rates, Timer.DefaultPercentiles)
+  def timer(name: String, unit: InstrumentUnit, rates: Array[Long], percentiles: Array[Long]): Timer = timer(name, unit, rates, percentiles, Timer.DefaultReservoir)
+  def timer(name: String, unit: InstrumentUnit, rates: Array[Long], percentiles: Array[Long], reservoir: Reservoir): Timer = timer(name, unit, rates, percentiles, reservoir, Seq.empty)
   def timer(name: String, unit: InstrumentUnit, rates: Array[Long], percentiles: Array[Long], reservoir: Reservoir, tags: Seq[String]): Timer = registerTimer(name, unit, rates, percentiles, reservoir, tags)
   def registerTimer(name: String, unit: InstrumentUnit, rates: Array[Long], percentiles: Array[Long], reservoir: Reservoir, tags: Seq[String]): Timer
   def unregisterTimer(name: String, tags: Seq[String]): Boolean
 
+  def histogram(name: String, unit: InstrumentUnit): Histogram = histogram(name, unit, Histogram.DefaultPercentiles)
+  def histogram(name: String, unit: InstrumentUnit, percentiles: Array[Long]): Histogram = histogram(name, unit, percentiles, Histogram.DefaultReservoir)
+  def histogram(name: String, unit: InstrumentUnit, percentiles: Array[Long], reservoir: Reservoir): Histogram = histogram(name, unit, percentiles, reservoir, Seq.empty)
   def histogram(name: String, unit: InstrumentUnit, percentiles: Array[Long], reservoir: Reservoir, tags: Seq[String]): Histogram = registerHistogram(name, unit, percentiles, reservoir, tags)
   def registerHistogram(name: String, unit: InstrumentUnit, percentiles: Array[Long], reservoir: Reservoir, tags: Seq[String]): Histogram
   def unregisterHistogram(name: String, tags: Seq[String]): Boolean

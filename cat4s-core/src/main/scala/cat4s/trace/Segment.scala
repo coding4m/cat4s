@@ -31,6 +31,6 @@ trait Segment {
   def isCompleted: Boolean = null != status
   def complete(status: TraceStatus): Unit
 
-  def collect[T](f: => T): T
-  def collectAsync[T](f: => Future[T])(implicit ec: ExecutionContext): Future[T]
+  def apply[T](f: => T): T
+  def collect[T](f: => Future[T])(implicit ec: ExecutionContext): Future[T]
 }

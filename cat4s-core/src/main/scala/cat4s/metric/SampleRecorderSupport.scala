@@ -52,9 +52,9 @@ abstract class SampleRecorderSupport(instrumentFactory: InstrumentFactory) exten
   def timer(
     name: String,
     unit: InstrumentUnit,
-    rates: Array[Long] = Meter.DefaultRates,
-    percentiles: Array[Long] = Histogram.DefaultPercentiles,
-    reservoir: Reservoir = Histogram.DefaultReservoir): Timer =
+    rates: Array[Long] = Timer.DefaultRates,
+    percentiles: Array[Long] = Timer.DefaultPercentiles,
+    reservoir: Reservoir = Timer.DefaultReservoir): Timer =
     register(TimerKey(name, unit), new Timer(rates, percentiles, reservoir))
   def removeTimer(name: String, unit: InstrumentUnit): Unit =
     unregister(TimerKey(name, unit))
@@ -75,5 +75,5 @@ abstract class SampleRecorderSupport(instrumentFactory: InstrumentFactory) exten
     }
     SampleSnapshot(snapshots.result())
   }
-  override def cleanup() = _instruments.values.foreach(_.cleanup())
+  override def cleanup(): Unit = _instruments.values.foreach(_.cleanup())
 }

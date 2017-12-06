@@ -24,14 +24,14 @@ import com.codahale.metrics.{ Clock, EWMA }
 /**
  * @author siuming
  */
-private[metric] object Meter {
+object Meter {
   val DefaultRates = Array(1L, 5L, 15L)
 
-  val Interval = 5
-  val TicketInterval = TimeUnit.SECONDS.toNanos(Interval)
-  val SecondsPerMinute = 60.0d
+  private[metric] val Interval = 5
+  private[metric] val TicketInterval = TimeUnit.SECONDS.toNanos(Interval)
+  private[metric] val SecondsPerMinute = 60.0d
 
-  def ewma(rate: Long): EWMA =
+  private[metric] def ewma(rate: Long): EWMA =
     new EWMA(1 - Math.exp(-Interval / SecondsPerMinute / rate), Interval, TimeUnit.SECONDS)
 }
 class Meter(rates: Array[Long]) extends Instrument {
@@ -45,7 +45,7 @@ class Meter(rates: Array[Long]) extends Instrument {
 
   override type Record = Long
   override type Snapshot = MeterSnapshot
-  override def record(value: Long) = {
+  override def record(value: Long): Unit = {
     tickIfNecessary()
     count.add(value)
     ewmas.values.foreach(_.update(value))
@@ -57,7 +57,7 @@ class Meter(rates: Array[Long]) extends Instrument {
       rates = ewmas.map(it => s"r${it._1}" -> it._2.getRate(TimeUnit.SECONDS))
     )
   }
-  private def tickIfNecessary() = {
+  private def tickIfNecessary(): Unit = {
     val oldTick = lastTick.get
     val newTick = clock.getTick
     val age = newTick - oldTick

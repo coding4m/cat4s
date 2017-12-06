@@ -26,7 +26,7 @@ class Gauge(identity: Any, resetAfterCollect: Boolean) extends Instrument {
 
   override type Record = Any
   override type Snapshot = GaugeSnapshot
-  override def record(value: Any) = _value.set(value)
+  override def record(value: Any): Unit = _value.set(value)
   override def collect(ctx: InstrumentContext) = {
     if (resetAfterCollect) GaugeSnapshot(_value.getAndSet(identity)) else GaugeSnapshot(_value.get())
   }

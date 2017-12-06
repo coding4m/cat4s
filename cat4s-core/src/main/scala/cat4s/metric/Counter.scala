@@ -25,7 +25,7 @@ class Counter(resetAfterCollect: Boolean) extends Instrument {
   private val adder = new LongAdder
   override type Record = Long
   override type Snapshot = CounterSnapshot
-  override def record(value: Long) = adder.add(value)
+  override def record(value: Long): Unit = adder.add(value)
   override def collect(ctx: InstrumentContext) = {
     if (resetAfterCollect) CounterSnapshot(adder.sumThenReset()) else CounterSnapshot(adder.sum())
   }

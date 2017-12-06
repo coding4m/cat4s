@@ -26,6 +26,7 @@ import com.typesafe.config.{ Config, ConfigFactory }
  */
 object Cat {
 
+  private val Name = "cat"
   @volatile private var instance = new Instance()
 
   def tracer: TraceSet = {
@@ -62,7 +63,7 @@ object Cat {
     }
 
     def start(config: Config): Unit = this.synchronized {
-      actorSystem = ActorSystem("cat", config.withOnlyPath("cat"))
+      actorSystem = ActorSystem(Name, config.withOnlyPath(Name))
       tracer = actorSystem.registerExtension(TraceRegistry)
       metrics = actorSystem.registerExtension(MetricRegistry)
       actorSystem.registerExtension(PluginLoader)

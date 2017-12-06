@@ -24,7 +24,9 @@ import com.codahale.metrics.{ Clock, EWMA }
 /**
  * @author siuming
  */
-object Meter {
+private[metric] object Meter {
+  val DefaultRates = Array(1L, 5L, 15L)
+
   val Interval = 5
   val TicketInterval = TimeUnit.SECONDS.toNanos(Interval)
   val SecondsPerMinute = 60.0d

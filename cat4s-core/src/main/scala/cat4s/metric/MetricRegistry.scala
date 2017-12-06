@@ -16,6 +16,9 @@
 
 package cat4s.metric
 import akka.actor.{ ActorRef, Cancellable, ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider }
+import com.codahale.metrics.Reservoir
+
+import scala.collection.concurrent.TrieMap
 
 /**
  * @author siuming
@@ -28,10 +31,64 @@ class MetricRegistry(system: ExtendedActorSystem) extends Extension with MetricS
   import SubscriptionProtocol._
   import SubscriptionController._
 
+  private val samples = TrieMap.empty[Sample, SampleRecorder]
   private val settings = new MetricSettings(system.settings.config)
   private val controller = system.actorOf(SubscriptionController.props(), SubscriptionController.Name)
 
   @volatile private var scheduler: Option[Cancellable] = None
+
+  override def registerCounter(name: String, unit: InstrumentUnit, resetAfterCollect: Boolean, tags: Seq[String]) = {
+    atomicGetOrElseUpdate(Sample(name, "counter", tags), {
+      new CounterRecorder(CounterKey(name, unit), new Counter(resetAfterCollect))
+    }, _.cleanup()).asInstanceOf[CounterRecorder].instrument
+  }
+  override def unregisterCounter(name: String, tags: Seq[String]) = removeSample(name, "counter", tags)
+
+  override def registerMinMaxCounter(name: String, unit: InstrumentUnit, resetAfterCollect: Boolean, tags: Seq[String]) = {
+    atomicGetOrElseUpdate(Sample(name, "min-max-counter", tags), {
+      new MinMaxCounterRecorder(MinMaxCounterKey(name, unit), new MinMaxCounter(resetAfterCollect))
+    }, _.cleanup()).asInstanceOf[MinMaxCounterRecorder].instrument
+  }
+  override def unregisterMinMaxCounter(name: String, tags: Seq[String]) = removeSample(name, "min-max-counter", tags)
+
+  override def registerGauge(name: String, unit: InstrumentUnit, identity: Any, resetAfterCollect: Boolean, tags: Seq[String]) = {
+    atomicGetOrElseUpdate(Sample(name, "gauge", tags), {
+      new GaugeRecorder(GaugeKey(name, unit), new Gauge(identity, resetAfterCollect))
+    }, _.cleanup()).asInstanceOf[GaugeRecorder].instrument
+  }
+  override def unregisterGauge(name: String, tags: Seq[String]) = removeSample(name, "gauge", tags)
+
+  override def registerMeter(name: String, unit: InstrumentUnit, rates: Array[Long], tags: Seq[String]) = {
+    atomicGetOrElseUpdate(Sample(name, "meter", tags), {
+      new MeterRecorder(MeterKey(name, unit), new Meter(rates))
+    }, _.cleanup()).asInstanceOf[MeterRecorder].instrument
+  }
+  override def unregisterMeter(name: String, tags: Seq[String]) = removeSample(name, "meter", tags)
+
+  override def registerTimer(name: String, unit: InstrumentUnit, rates: Array[Long], percentiles: Array[Long], reservoir: Reservoir, tags: Seq[String]) = {
+    atomicGetOrElseUpdate(Sample(name, "timer", tags), {
+      new TimerRecorder(TimerKey(name, unit), new Timer(rates, percentiles, reservoir))
+    }, _.cleanup()).asInstanceOf[TimerRecorder].instrument
+  }
+  override def unregisterTimer(name: String, tags: Seq[String]) = removeSample(name, "timer", tags)
+
+  override def registerHistogram(name: String, unit: InstrumentUnit, percentiles: Array[Long], reservoir: Reservoir, tags: Seq[String]) = {
+    atomicGetOrElseUpdate(Sample(name, "histogram", tags), {
+      new HistogramRecorder(HistogramKey(name, unit), new Histogram(percentiles, reservoir))
+    }, _.cleanup()).asInstanceOf[HistogramRecorder].instrument
+  }
+  override def unregisterHistogram(name: String, tags: Seq[String]) = removeSample(name, "histogram", tags)
+
+  override def sample[T <: SampleRecorder](rf: SampleRecorderFactory[T], name: String, tags: Seq[String]) = {
+    atomicGetOrElseUpdate(Sample(name, rf.catelog, tags), {
+      rf.createRecorder(null)
+    }, _.cleanup()).asInstanceOf[T]
+  }
+  override def removeSample(sample: Sample) = {
+    val recorder = samples.remove(sample)
+    recorder.foreach(_.cleanup())
+    recorder.isDefined
+  }
 
   override def subscribe(subscriber: ActorRef, filter: MetricFilter, permanently: Boolean) = controller ! Subscribe(subscriber, filter, permanently)
   override def unsubscribe(subscriber: ActorRef) = controller ! Unsubscribe(subscriber)
@@ -48,4 +105,19 @@ class MetricRegistry(system: ExtendedActorSystem) extends Extension with MetricS
     controller ! Process
   }
   override private[cat4s] def stop() = scheduler.foreach(_.cancel())
+
+  private def atomicGetOrElseUpdate(key: Sample, op: ⇒ SampleRecorder, cleanup: SampleRecorder ⇒ Unit): SampleRecorder = {
+    samples.get(key) match {
+      case Some(v) ⇒ v
+      case None ⇒
+        val d = op
+        samples.putIfAbsent(key, d).map { oldValue ⇒
+          // If there was an old value then `d` was never added
+          // and thus need to be cleanup.
+          cleanup(d)
+          oldValue
+
+        } getOrElse d
+    }
+  }
 }

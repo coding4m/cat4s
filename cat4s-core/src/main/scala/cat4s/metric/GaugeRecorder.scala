@@ -19,4 +19,4 @@ package cat4s.metric
 /**
  * @author siuming
  */
-class GaugeRecorder(val key: InstrumentKey, val instrument: Gauge) extends InstrumentRecorder
+class GaugeRecorder(val key: GaugeKey, val instrument: Gauge) extends InstrumentRecorder

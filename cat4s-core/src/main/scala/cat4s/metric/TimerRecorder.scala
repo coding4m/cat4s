@@ -19,4 +19,4 @@ package cat4s.metric
 /**
  * @author siuming
  */
-class TimerRecorder(val key: InstrumentKey, val instrument: Timer) extends InstrumentRecorder
+class TimerRecorder(val key: TimerKey, val instrument: Timer) extends InstrumentRecorder

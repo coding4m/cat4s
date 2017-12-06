@@ -16,11 +16,15 @@
 
 package cat4s.metric
 
-import com.codahale.metrics.Reservoir
+import com.codahale.metrics.{ ExponentiallyDecayingReservoir, Reservoir }
 
 /**
  * @author siuming
  */
+private[metric] object Histogram {
+  val DefaultReservoir = new ExponentiallyDecayingReservoir()
+  val DefaultPercentiles = Array(1L, 5L, 10L, 90L, 95L, 99L)
+}
 class Histogram(percentiles: Array[Long], reservoir: Reservoir) extends Instrument {
   require(percentiles.forall(_ > 0) && percentiles.forall(_ <= 100), "percentile must be in (0..100].")
   require(null != reservoir, "reservoir must not be null.")

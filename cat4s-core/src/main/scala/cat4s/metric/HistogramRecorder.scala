@@ -19,4 +19,4 @@ package cat4s.metric
 /**
  * @author siuming
  */
-class HistogramRecorder(val key: InstrumentKey, val instrument: Histogram) extends InstrumentRecorder
+class HistogramRecorder(val key: HistogramKey, val instrument: Histogram) extends InstrumentRecorder

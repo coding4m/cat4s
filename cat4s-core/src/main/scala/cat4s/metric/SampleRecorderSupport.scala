@@ -23,13 +23,7 @@ import scala.collection.concurrent.TrieMap
 /**
  * @author siuming
  */
-object GenericRecorder {
-  val DefaultRates = Array(1L, 5L, 15L)
-  val DefaultReservoir = new ExponentiallyDecayingReservoir()
-  val DefaultPercentiles = Array(1L, 5L, 10L, 90L, 95L, 99L)
-}
-abstract class GenericRecorder(instrumentFactory: InstrumentFactory) extends SampleRecorder {
-  import GenericRecorder._
+abstract class SampleRecorderSupport(instrumentFactory: InstrumentFactory) extends SampleRecorder {
 
   private val _instruments = TrieMap.empty[InstrumentKey, Instrument]
   private def register[T <: Instrument](key: InstrumentKey, instrument: ⇒ T): T = ???
@@ -50,7 +44,7 @@ abstract class GenericRecorder(instrumentFactory: InstrumentFactory) extends Sam
   protected def removeGauge(name: String, unit: InstrumentUnit): Unit =
     unregister(GaugeKey(name, unit))
 
-  def meter(name: String, unit: InstrumentUnit, rates: Array[Long] = DefaultRates): Meter =
+  def meter(name: String, unit: InstrumentUnit, rates: Array[Long] = Meter.DefaultRates): Meter =
     register(MeterKey(name, unit), new Meter(rates))
   def removeMeter(name: String, unit: InstrumentUnit): Unit =
     unregister(MeterKey(name, unit))
@@ -58,9 +52,9 @@ abstract class GenericRecorder(instrumentFactory: InstrumentFactory) extends Sam
   def timer(
     name: String,
     unit: InstrumentUnit,
-    rates: Array[Long] = DefaultRates,
-    percentiles: Array[Long] = DefaultPercentiles,
-    reservoir: Reservoir = DefaultReservoir): Timer =
+    rates: Array[Long] = Meter.DefaultRates,
+    percentiles: Array[Long] = Histogram.DefaultPercentiles,
+    reservoir: Reservoir = Histogram.DefaultReservoir): Timer =
     register(TimerKey(name, unit), new Timer(rates, percentiles, reservoir))
   def removeTimer(name: String, unit: InstrumentUnit): Unit =
     unregister(TimerKey(name, unit))
@@ -68,8 +62,8 @@ abstract class GenericRecorder(instrumentFactory: InstrumentFactory) extends Sam
   def histogram(
     name: String,
     unit: InstrumentUnit,
-    percentiles: Array[Long] = DefaultPercentiles,
-    reservoir: Reservoir = DefaultReservoir): Histogram =
+    percentiles: Array[Long] = Histogram.DefaultPercentiles,
+    reservoir: Reservoir = Histogram.DefaultReservoir): Histogram =
     register(HistogramKey(name, unit), new Histogram(percentiles, reservoir))
   def removeHistogram(name: String, unit: InstrumentUnit): Unit =
     unregister(HistogramKey(name, unit))

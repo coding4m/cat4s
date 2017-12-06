@@ -19,4 +19,4 @@ package cat4s.metric
 /**
  * @author siuming
  */
-class CounterRecorder(val key: InstrumentKey, val instrument: Counter) extends InstrumentRecorder
+class CounterRecorder(val key: CounterKey, val instrument: Counter) extends InstrumentRecorder

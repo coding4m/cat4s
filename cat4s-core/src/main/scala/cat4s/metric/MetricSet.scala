@@ -17,13 +17,44 @@
 package cat4s.metric
 
 import akka.actor.ActorRef
+import com.codahale.metrics.Reservoir
 
 /**
  * @author siuming
  */
 trait MetricSet {
-  def sample[T <: SampleRecorder](recorderFactory: SampleRecorderFactory[T], name: String): T = ???
-  def removeSample() = ???
+
+  def counter(name: String, unit: InstrumentUnit, resetAfterCollect: Boolean): Counter = counter(name, unit, resetAfterCollect, Seq.empty)
+  def counter(name: String, unit: InstrumentUnit, resetAfterCollect: Boolean, tags: Seq[String]): Counter = registerCounter(name, unit, resetAfterCollect, tags)
+  def registerCounter(name: String, unit: InstrumentUnit, resetAfterCollect: Boolean, tags: Seq[String]): Counter
+  def unregisterCounter(name: String, tags: Seq[String]): Boolean
+
+  def minMaxCounter(name: String, unit: InstrumentUnit, resetAfterCollect: Boolean, tags: Seq[String]): MinMaxCounter = registerMinMaxCounter(name, unit, resetAfterCollect, tags)
+  def registerMinMaxCounter(name: String, unit: InstrumentUnit, resetAfterCollect: Boolean, tags: Seq[String]): MinMaxCounter
+  def unregisterMinMaxCounter(name: String, tags: Seq[String]): Boolean
+
+  def gauge(name: String, unit: InstrumentUnit, identity: Any, resetAfterCollect: Boolean, tags: Seq[String]): Gauge = registerGauge(name, unit, identity, resetAfterCollect, tags)
+  def registerGauge(name: String, unit: InstrumentUnit, identity: Any, resetAfterCollect: Boolean, tags: Seq[String]): Gauge
+  def unregisterGauge(name: String, tags: Seq[String]): Boolean
+
+  def meter(name: String, unit: InstrumentUnit, rates: Array[Long], tags: Seq[String]): Meter = registerMeter(name, unit, rates, tags)
+  def registerMeter(name: String, unit: InstrumentUnit, rates: Array[Long], tags: Seq[String]): Meter
+  def unregisterMeter(name: String, tags: Seq[String]): Boolean
+
+  def timer(name: String, unit: InstrumentUnit, rates: Array[Long], percentiles: Array[Long], reservoir: Reservoir, tags: Seq[String]): Timer = registerTimer(name, unit, rates, percentiles, reservoir, tags)
+  def registerTimer(name: String, unit: InstrumentUnit, rates: Array[Long], percentiles: Array[Long], reservoir: Reservoir, tags: Seq[String]): Timer
+  def unregisterTimer(name: String, tags: Seq[String]): Boolean
+
+  def histogram(name: String, unit: InstrumentUnit, percentiles: Array[Long], reservoir: Reservoir, tags: Seq[String]): Histogram = registerHistogram(name, unit, percentiles, reservoir, tags)
+  def registerHistogram(name: String, unit: InstrumentUnit, percentiles: Array[Long], reservoir: Reservoir, tags: Seq[String]): Histogram
+  def unregisterHistogram(name: String, tags: Seq[String]): Boolean
+
+  def sample[T <: SampleRecorder](rf: SampleRecorderFactory[T], name: String): T = sample(rf, name, Seq.empty)
+  def sample[T <: SampleRecorder](rf: SampleRecorderFactory[T], name: String, tags: Seq[String]): T
+  def removeSample[T <: SampleRecorder](rf: SampleRecorderFactory[T], name: String): Boolean = removeSample(name, rf.catelog)
+  def removeSample(name: String, catelog: String): Boolean = removeSample(name, catelog, Seq.empty)
+  def removeSample(name: String, catelog: String, tags: Seq[String]): Boolean = removeSample(Sample(name, catelog, tags))
+  def removeSample(sample: Sample): Boolean
 
   def subscribe(subscriber: ActorRef, filter: MetricFilter, permanently: Boolean): Unit
   def unsubscribe(subscriber: ActorRef): Unit

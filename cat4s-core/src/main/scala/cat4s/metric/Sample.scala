@@ -19,4 +19,4 @@ package cat4s.metric
 /**
  * @author siuming
  */
-case class Sample(name: String, catelog: String, tags: Seq[String] = Seq.empty)
+case class Sample(name: String, catalog: String, tags: Seq[String] = Seq.empty)

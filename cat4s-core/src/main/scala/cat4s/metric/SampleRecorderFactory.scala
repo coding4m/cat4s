@@ -20,6 +20,6 @@ package cat4s.metric
  * @author siuming
  */
 trait SampleRecorderFactory[T <: SampleRecorder] {
-  def catelog: String
+  def catalog: String
   def createRecorder(instrumentFactory: InstrumentFactory): T
 }

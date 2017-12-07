@@ -19,7 +19,7 @@ package cat4s.metric
 /**
  * @author siuming
  */
-object InstrumentCatelog {
+object InstrumentCatalog {
   val Counter = "counter"
   val MinMaxCounter = "min-max-counter"
   val Gauge = "gauge"

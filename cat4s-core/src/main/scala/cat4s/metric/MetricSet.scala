@@ -65,7 +65,7 @@ trait MetricSet {
 
   def sample[T <: SampleRecorder](rf: SampleRecorderFactory[T], name: String): T = sample(rf, name, Seq.empty)
   def sample[T <: SampleRecorder](rf: SampleRecorderFactory[T], name: String, tags: Seq[String]): T
-  def removeSample[T <: SampleRecorder](rf: SampleRecorderFactory[T], name: String): Boolean = removeSample(name, rf.catelog)
+  def removeSample[T <: SampleRecorder](rf: SampleRecorderFactory[T], name: String): Boolean = removeSample(name, rf.catalog)
   def removeSample(name: String, catelog: String): Boolean = removeSample(name, catelog, Seq.empty)
   def removeSample(name: String, catelog: String, tags: Seq[String]): Boolean = removeSample(Sample(name, catelog, tags))
   def removeSample(sample: Sample): Boolean

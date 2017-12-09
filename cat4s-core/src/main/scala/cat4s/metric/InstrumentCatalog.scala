@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 - 2016 Forever High Tech <http://www.foreverht.com> - all rights reserved.
+ * Copyright 2017 - 2018 Forever High Tech <http://www.foreverht.com> - all rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

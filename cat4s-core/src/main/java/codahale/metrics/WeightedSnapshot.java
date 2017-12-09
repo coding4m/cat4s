@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 - 2016 Forever High Tech <http://www.foreverht.com> - all rights reserved.
+ * Copyright 2017 - 2018 Forever High Tech <http://www.foreverht.com> - all rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,8 +52,8 @@ public class WeightedSnapshot extends Snapshot {
      *
      * @param values an unordered set of values in the reservoir
      */
-    public WeightedSnapshot(Collection<WeightedSample> values) {
-        final WeightedSample[] copy = values.toArray(new WeightedSample[]{});
+    public WeightedSnapshot(Collection<WeightedSnapshot.WeightedSample> values) {
+        final WeightedSnapshot.WeightedSample[] copy = values.toArray(new WeightedSnapshot.WeightedSample[]{});
 
         Arrays.sort(copy, Comparator.comparing(w -> w.value));
 
@@ -62,7 +62,7 @@ public class WeightedSnapshot extends Snapshot {
         this.quantiles = new double[copy.length];
 
         double sumWeight = 0;
-        for (WeightedSample sample : copy) {
+        for (WeightedSnapshot.WeightedSample sample : copy) {
             sumWeight += sample.weight;
         }
 

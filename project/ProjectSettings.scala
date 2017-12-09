@@ -68,7 +68,7 @@ object ProjectSettings {
   )
 
   lazy val headerSettings: Seq[Setting[_]] = {
-    val header = Apache2_0("2015 - 2016", "Forever High Tech <http://www.foreverht.com> - all rights reserved.")
+    val header = Apache2_0("2017 - 2018", "Forever High Tech <http://www.foreverht.com> - all rights reserved.")
 
     Seq(headers := Map(
       "scala" -> header,
@@ -177,19 +177,19 @@ object ProjectSettings {
   // ----------------------------------------------------------------------
   //  Documentation settings
   // ----------------------------------------------------------------------
-
-  lazy val documentationSettings: Seq[Setting[_]] =
-    unidocSettings ++
-      site.settings ++
-      site.sphinxSupport() ++
-      site.includeScaladoc() ++
-      ghpages.settings ++
-      Seq(
-        git.remoteRepo := "git@git.oschina.net:workplus/butterfly-extensions.git",
-        site.addMappingsToSiteDir(mappings in(ScalaUnidoc, packageDoc), "latest/api"),
-        unmanagedSourceDirectories in Test += baseDirectory.value / "src" / "sphinx" / "code",
-        scalacOptions in(Compile, doc) := List("-skip-packages", "akka")
-      )
+//
+//  lazy val documentationSettings: Seq[Setting[_]] =
+//    unidocSettings ++
+//      site.settings ++
+//      site.sphinxSupport() ++
+//      site.includeScaladoc() ++
+//      ghpages.settings ++
+//      Seq(
+//        git.remoteRepo := "git@github.com:coding4m/cat4s.git",
+//        site.addMappingsToSiteDir(mappings in(ScalaUnidoc, packageDoc), "latest/api"),
+//        unmanagedSourceDirectories in Test += baseDirectory.value / "src" / "sphinx" / "code",
+//        scalacOptions in(Compile, doc) := List("-skip-packages", "akka")
+//      )
 
   // ----------------------------------------------------------------------
   //  Example application settings

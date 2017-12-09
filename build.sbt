@@ -8,7 +8,8 @@ version in ThisBuild := "1.0.0-SNAPSHOT"
 
 organization in ThisBuild := "cat4s"
 
-scalaVersion in ThisBuild := "2.11.11"
+scalaVersion in ThisBuild := "2.12.4"
+crossScalaVersions := Seq("2.12.4", "2.11.12")
 
 javacOptions in ThisBuild ++= Seq("-source", "1.8", "-target", "1.8", "-Xlint")
 
@@ -118,5 +119,5 @@ lazy val root = (project in file("."))
   .aggregate(aggregateProjects: _*)
   .settings(name := "cat4s")
   .settings(commonSettings: _*)
-  .settings(documentationSettings: _*)
+//  .settings(documentationSettings: _*)
   .enablePlugins(HeaderPlugin, AutomateHeaderPlugin)

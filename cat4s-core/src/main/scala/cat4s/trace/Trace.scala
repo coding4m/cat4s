@@ -152,7 +152,7 @@ class Trace private[trace] (name: String, source: TraceSource, dispatcher: Actor
     this
   }
 
-  def withDatas(tags: Map[String, String]): Trace = {
+  def withData(tags: Map[String, String]): Trace = {
     this.data = this.data ++ tags
     this
   }

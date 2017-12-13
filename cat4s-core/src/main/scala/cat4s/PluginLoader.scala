@@ -16,10 +16,10 @@
 
 package cat4s
 
-import akka.actor.{ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider}
+import akka.actor.{ ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider }
 import com.typesafe.config.Config
 import org.aspectj.lang.ProceedingJoinPoint
-import org.aspectj.lang.annotation.{Around, Aspect, Pointcut}
+import org.aspectj.lang.annotation.{ Around, Aspect, Pointcut }
 
 /**
  * @author siuming
@@ -29,7 +29,7 @@ private[cat4s] object PluginLoader extends ExtensionId[PluginLoader] with Extens
   override def createExtension(system: ExtendedActorSystem) = new PluginLoader(system)
 }
 private[cat4s] class PluginLoader(system: ExtendedActorSystem) extends Extension {
-  val settings = new PluginSettings(system.settings.config)
+  val settings = PluginSettings(system.settings.config)
 
   if (settings.aspectJWarning && settings.aspectJPlugins.nonEmpty && !isAspectJPresent) {
     //warning.. todo
@@ -54,35 +54,27 @@ private[cat4s] class PluginAspect {
   @Around("aspectJPresent()")
   def aspectJEnabled(pjp: ProceedingJoinPoint): Boolean = true
 }
-private[cat4s] class PluginSettings(config: Config) {
+private[cat4s] object PluginSettings {
   import scala.collection.JavaConverters._
-
-  val enablePlugins: Seq[String] =
-    config.getStringList("cat.enable-plugins").asScala
-
-  val enableAllPlugins: Boolean =
-    config.getBoolean("cat.enable-all-plugins")
-
-  val availablePlugins: Set[PluginInfo] = {
-    val plugins = config
-      .getConfig("cat.plugin")
-      .entrySet().asScala
-      .map(entry => entry.getKey.takeWhile(_ != '.'))
-      .toSet
-    if (enableAllPlugins) plugins.map(loadPluginInfo(config, _)) else plugins.filter(enablePlugins.contains).map(loadPluginInfo(config, _))
+  def apply(config: Config): PluginSettings = {
+    val enablePlugins: Seq[String] = config.getStringList("cat.enable-plugins").asScala
+    val enableAllPlugins: Boolean = config.getBoolean("cat.enable-all-plugins")
+    val availablePlugins: Set[PluginInfo] = {
+      val plugins = config
+        .getConfig("cat.plugin")
+        .entrySet().asScala
+        .map(entry => entry.getKey.takeWhile(_ != '.'))
+        .toSet
+      if (enableAllPlugins) plugins.map(loadPluginInfo(config, _)) else plugins.filter(enablePlugins.contains).map(loadPluginInfo(config, _))
+    }
+    new PluginSettings(availablePlugins, config.getBoolean("cat.aspectj-warning"))
   }
-
-  val aspectJError: Boolean =
-    config.getBoolean("cat.aspectj-error")
-
-  val aspectJWarning: Boolean =
-    config.getBoolean("cat.aspectj-warning")
-
-  val aspectJPlugins =
-    availablePlugins.filter(_.aspectJRequired)
 
   private def loadPluginInfo(config: Config, name: String): PluginInfo = {
     val conf = config.getConfig(s"cat.plugin.$name")
     PluginInfo(name, conf.getBoolean("aspectj-required"), conf.getString("entry-point"))
   }
+}
+private[cat4s] class PluginSettings(val availablePlugins: Set[PluginInfo], val aspectJWarning: Boolean) {
+  val aspectJPlugins = availablePlugins.filter(_.aspectJRequired)
 }

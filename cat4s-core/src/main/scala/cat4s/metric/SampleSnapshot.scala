@@ -19,4 +19,4 @@ package cat4s.metric
 /**
  * @author siuming
  */
-case class SampleSnapshot(metrics: Map[InstrumentKey, InstrumentSnapshot])
+case class SampleSnapshot(instruments: Map[InstrumentKey, InstrumentSnapshot])

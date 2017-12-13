@@ -26,14 +26,14 @@ object MetricTest extends App {
   val lines = Source.stdin.getLines
 
   Cat.start()
-  val c0 = Cat.metrics.counter("c0", null)
-  val c1 = Cat.metrics.counter("c1", null)
-  val m0 = Cat.metrics.meter("m0", null)
-  val m1 = Cat.metrics.meter("m1", null)
-  val h0 = Cat.metrics.histogram("h0", null)
-  val h1 = Cat.metrics.histogram("h0", null)
-  val mc0 = Cat.metrics.minMaxCounter("mc0", null)
-  val mc1 = Cat.metrics.minMaxCounter("mc1", null)
+  val c0 = Cat.metrics.counter("c0")
+  val c1 = Cat.metrics.counter("c1")
+  val m0 = Cat.metrics.meter("m0")
+  val m1 = Cat.metrics.meter("m1")
+  val h0 = Cat.metrics.histogram("h0")
+  val h1 = Cat.metrics.histogram("h0")
+  val mc0 = Cat.metrics.minMaxCounter("mc0")
+  val mc1 = Cat.metrics.minMaxCounter("mc1")
   prompt()
 
   private def prompt(): Unit = {

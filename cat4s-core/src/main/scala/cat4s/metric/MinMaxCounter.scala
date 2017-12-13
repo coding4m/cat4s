@@ -17,18 +17,13 @@
 package cat4s.metric
 
 import java.util.concurrent.atomic.{ LongAccumulator, LongAdder }
-import java.util.function.LongBinaryOperator
 
 /**
  * @author siuming
  */
 class MinMaxCounter(resetAfterCollect: Boolean) extends Instrument {
-  private val min = new LongAccumulator(new LongBinaryOperator {
-    override def applyAsLong(left: Long, right: Long) = Math.min(left, right)
-  }, 0L)
-  private val max = new LongAccumulator(new LongBinaryOperator {
-    override def applyAsLong(left: Long, right: Long) = Math.max(left, right)
-  }, 0L)
+  private val min = new LongAccumulator((left: Long, right: Long) => Math.min(left, right), 0L)
+  private val max = new LongAccumulator((left: Long, right: Long) => Math.max(left, right), 0L)
   private val count = new LongAdder
 
   override type Record = Long

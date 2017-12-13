@@ -19,4 +19,7 @@ package cat4s.metric
 /**
  * @author siuming
  */
-case class MeterSnapshot(count: Long, rates: Map[String, Double]) extends InstrumentSnapshot
+case class MeterSnapshot(count: Long, rates: Map[String, Double]) extends InstrumentSnapshot {
+  override type S = MeterSnapshot
+  override def accumulate(ctx: InstrumentContext, that: MeterSnapshot) = that
+}

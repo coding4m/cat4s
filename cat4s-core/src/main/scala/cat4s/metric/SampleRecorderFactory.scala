@@ -21,5 +21,5 @@ package cat4s.metric
  */
 trait SampleRecorderFactory[T <: SampleRecorder] {
   def catalog: String
-  def createRecorder(instrumentFactory: InstrumentFactory): T
+  def createRecorder(): T
 }

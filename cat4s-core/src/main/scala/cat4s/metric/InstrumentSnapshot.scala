@@ -20,5 +20,6 @@ package cat4s.metric
  * @author siuming
  */
 trait InstrumentSnapshot {
-
+  type S <: InstrumentSnapshot
+  def accumulate(ctx: InstrumentContext, that: S): S
 }

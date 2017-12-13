@@ -37,52 +37,50 @@ class MetricRegistry(system: ExtendedActorSystem) extends Extension with MetricS
 
   @volatile private var collector: Option[Cancellable] = None
 
-  override def registerCounter(name: String, unit: InstrumentUnit, resetAfterCollect: Boolean, tags: Seq[String]) = {
+  override def registerCounter(name: String, resetAfterCollect: Boolean, tags: Seq[String]) = {
     atomicGetOrElseUpdate(Sample(name, InstrumentCatalog.Counter, tags), {
-      new CounterRecorder(CounterKey(name, unit), new Counter(resetAfterCollect))
+      new CounterRecorder(CounterKey(name), new Counter(resetAfterCollect))
     }, _.cleanup()).asInstanceOf[CounterRecorder].instrument
   }
   override def unregisterCounter(name: String, tags: Seq[String]) = removeSample(name, InstrumentCatalog.Counter, tags)
 
-  override def registerMinMaxCounter(name: String, unit: InstrumentUnit, resetAfterCollect: Boolean, tags: Seq[String]) = {
+  override def registerMinMaxCounter(name: String, resetAfterCollect: Boolean, tags: Seq[String]) = {
     atomicGetOrElseUpdate(Sample(name, InstrumentCatalog.MinMaxCounter, tags), {
-      new MinMaxCounterRecorder(MinMaxCounterKey(name, unit), new MinMaxCounter(resetAfterCollect))
+      new MinMaxCounterRecorder(MinMaxCounterKey(name), new MinMaxCounter(resetAfterCollect))
     }, _.cleanup()).asInstanceOf[MinMaxCounterRecorder].instrument
   }
   override def unregisterMinMaxCounter(name: String, tags: Seq[String]) = removeSample(name, InstrumentCatalog.MinMaxCounter, tags)
 
-  override def registerGauge(name: String, unit: InstrumentUnit, identity: Any, resetAfterCollect: Boolean, tags: Seq[String]) = {
+  override def registerGauge(name: String, identity: Any, resetAfterCollect: Boolean, tags: Seq[String]) = {
     atomicGetOrElseUpdate(Sample(name, InstrumentCatalog.Gauge, tags), {
-      new GaugeRecorder(GaugeKey(name, unit), new Gauge(identity, resetAfterCollect))
+      new GaugeRecorder(GaugeKey(name), new Gauge(identity, resetAfterCollect))
     }, _.cleanup()).asInstanceOf[GaugeRecorder].instrument
   }
   override def unregisterGauge(name: String, tags: Seq[String]) = removeSample(name, InstrumentCatalog.Gauge, tags)
 
-  override def registerMeter(name: String, unit: InstrumentUnit, rates: Array[Long], tags: Seq[String]) = {
+  override def registerMeter(name: String, rates: Array[Long], tags: Seq[String]) = {
     atomicGetOrElseUpdate(Sample(name, InstrumentCatalog.Meter, tags), {
-      new MeterRecorder(MeterKey(name, unit), new Meter(rates))
+      new MeterRecorder(MeterKey(name), new Meter(rates))
     }, _.cleanup()).asInstanceOf[MeterRecorder].instrument
   }
   override def unregisterMeter(name: String, tags: Seq[String]) = removeSample(name, InstrumentCatalog.Meter, tags)
 
-  override def registerTimer(name: String, unit: InstrumentUnit, rates: Array[Long], percentiles: Array[Long], reservoir: Reservoir, tags: Seq[String]) = {
+  override def registerTimer(name: String, rates: Array[Long], percentiles: Array[Long], reservoir: Reservoir, tags: Seq[String]) = {
     atomicGetOrElseUpdate(Sample(name, InstrumentCatalog.Timer, tags), {
-      new TimerRecorder(TimerKey(name, unit), new Timer(rates, percentiles, reservoir))
+      new TimerRecorder(TimerKey(name), new Timer(rates, percentiles, reservoir))
     }, _.cleanup()).asInstanceOf[TimerRecorder].instrument
   }
   override def unregisterTimer(name: String, tags: Seq[String]) = removeSample(name, InstrumentCatalog.Timer, tags)
 
-  override def registerHistogram(name: String, unit: InstrumentUnit, percentiles: Array[Long], reservoir: Reservoir, tags: Seq[String]) = {
+  override def registerHistogram(name: String, percentiles: Array[Long], reservoir: Reservoir, tags: Seq[String]) = {
     atomicGetOrElseUpdate(Sample(name, InstrumentCatalog.Histogram, tags), {
-      new HistogramRecorder(HistogramKey(name, unit), new Histogram(percentiles, reservoir))
+      new HistogramRecorder(HistogramKey(name), new Histogram(percentiles, reservoir))
     }, _.cleanup()).asInstanceOf[HistogramRecorder].instrument
   }
   override def unregisterHistogram(name: String, tags: Seq[String]) = removeSample(name, InstrumentCatalog.Histogram, tags)
 
   override def sample[T <: SampleRecorder](rf: SampleRecorderFactory[T], name: String, tags: Seq[String]) = {
-    atomicGetOrElseUpdate(Sample(name, rf.catalog, tags), {
-      rf.createRecorder(null)
-    }, _.cleanup()).asInstanceOf[T]
+    atomicGetOrElseUpdate(Sample(name, rf.catalog, tags), rf.createRecorder(), _.cleanup()).asInstanceOf[T]
   }
   override def removeSample(sample: Sample) = {
     val recorder = samples.remove(sample)
@@ -112,12 +110,12 @@ class MetricRegistry(system: ExtendedActorSystem) extends Extension with MetricS
   }
   override private[cat4s] def stop(): Unit = collector.foreach(_.cancel())
 
-  private def atomicGetOrElseUpdate(key: Sample, op: ⇒ SampleRecorder, cleanup: SampleRecorder ⇒ Unit): SampleRecorder = {
+  private def atomicGetOrElseUpdate(key: Sample, op: => SampleRecorder, cleanup: SampleRecorder => Unit): SampleRecorder = {
     samples.get(key) match {
-      case Some(v) ⇒ v
-      case None ⇒
+      case Some(v) => v
+      case None =>
         val d = op
-        samples.putIfAbsent(key, d).map { oldValue ⇒
+        samples.putIfAbsent(key, d).map { oldValue =>
           // If there was an old value then `d` was never added
           // and thus need to be cleanup.
           cleanup(d)

@@ -25,4 +25,7 @@ case class HistogramSnapshot(
   mean: Double,
   stdDev: Double,
   percentiles: Map[String, Double]
-) extends InstrumentSnapshot
+) extends InstrumentSnapshot {
+  override type S = HistogramSnapshot
+  override def accumulate(ctx: InstrumentContext, that: HistogramSnapshot) = that
+}

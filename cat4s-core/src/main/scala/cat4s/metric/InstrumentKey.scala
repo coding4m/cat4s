@@ -21,11 +21,10 @@ package cat4s.metric
  */
 trait InstrumentKey {
   def name: String
-  def unit: InstrumentUnit
 }
-case class CounterKey(name: String, unit: InstrumentUnit) extends InstrumentKey
-case class MinMaxCounterKey(name: String, unit: InstrumentUnit) extends InstrumentKey
-case class GaugeKey(name: String, unit: InstrumentUnit) extends InstrumentKey
-case class MeterKey(name: String, unit: InstrumentUnit) extends InstrumentKey
-case class TimerKey(name: String, unit: InstrumentUnit) extends InstrumentKey
-case class HistogramKey(name: String, unit: InstrumentUnit) extends InstrumentKey
+case class CounterKey(name: String) extends InstrumentKey
+case class MinMaxCounterKey(name: String) extends InstrumentKey
+case class GaugeKey(name: String) extends InstrumentKey
+case class MeterKey(name: String) extends InstrumentKey
+case class TimerKey(name: String) extends InstrumentKey
+case class HistogramKey(name: String) extends InstrumentKey

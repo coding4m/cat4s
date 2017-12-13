@@ -19,4 +19,7 @@ package cat4s.metric
 /**
  * @author siuming
  */
-case class GaugeSnapshot(value: Any) extends InstrumentSnapshot
+case class GaugeSnapshot(value: Any) extends InstrumentSnapshot {
+  override type S = GaugeSnapshot
+  override def accumulate(ctx: InstrumentContext, that: GaugeSnapshot) = that
+}

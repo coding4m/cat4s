@@ -19,4 +19,7 @@ package cat4s.metric
 /**
  * @author siuming
  */
-case class CounterSnapshot(value: Long) extends InstrumentSnapshot
+case class CounterSnapshot(value: Long) extends InstrumentSnapshot {
+  override type S = CounterSnapshot
+  override def accumulate(ctx: InstrumentContext, that: CounterSnapshot) = that
+}

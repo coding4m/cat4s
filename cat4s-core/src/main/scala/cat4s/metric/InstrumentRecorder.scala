@@ -23,5 +23,5 @@ abstract class InstrumentRecorder extends SampleRecorder {
   def key: InstrumentKey
   def instrument: Instrument
   override def collect(ctx: InstrumentContext) = SampleSnapshot(Map(key -> instrument.collect(ctx)))
-  override def cleanup() = instrument.cleanup()
+  override def cleanup(): Unit = instrument.cleanup()
 }

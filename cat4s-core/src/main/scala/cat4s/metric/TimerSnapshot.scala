@@ -27,4 +27,7 @@ case class TimerSnapshot(
   mean: Double,
   stdDev: Double,
   percentiles: Map[String, Double]
-) extends InstrumentSnapshot
+) extends InstrumentSnapshot {
+  override type S = TimerSnapshot
+  override def accumulate(ctx: InstrumentContext, that: TimerSnapshot) = that
+}

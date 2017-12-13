@@ -19,4 +19,7 @@ package cat4s.metric
 /**
  * @author siuming
  */
-case class MinMaxCounterSnapshot(min: Long, max: Long, value: Long) extends InstrumentSnapshot
+case class MinMaxCounterSnapshot(min: Long, max: Long, value: Long) extends InstrumentSnapshot {
+  override type S = MinMaxCounterSnapshot
+  override def accumulate(ctx: InstrumentContext, that: MinMaxCounterSnapshot) = that
+}

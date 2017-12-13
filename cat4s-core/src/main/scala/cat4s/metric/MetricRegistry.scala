@@ -102,7 +102,7 @@ class MetricRegistry(system: ExtendedActorSystem) extends Extension with MetricS
       }
       val metrics = builder.result()
       if (metrics.nonEmpty) {
-        controller ! MetricSample(metrics)
+        controller ! MetricSnapshot(metrics)
       }
     })
 

@@ -20,4 +20,5 @@ package cat4s.metric
  * @author siuming
  */
 trait MetricFilter {
+  def accept(sample: Sample): Boolean
 }

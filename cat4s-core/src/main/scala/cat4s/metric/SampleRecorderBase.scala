@@ -46,36 +46,36 @@ abstract class SampleRecorderBase extends SampleRecorder {
   protected def removeGauge(name: String): Unit =
     unregister(GaugeKey(name))
 
-  def meter(name: String, rates: Array[Long] = Meter.DefaultRates): Meter =
+  protected def meter(name: String, rates: Array[Long] = Meter.DefaultRates): Meter =
     register(MeterKey(name), new Meter(rates))
-  def removeMeter(name: String): Unit =
+  protected def removeMeter(name: String): Unit =
     unregister(MeterKey(name))
 
-  def timer(
+  protected def timer(
     name: String,
     rates: Array[Long] = Timer.DefaultRates,
     percentiles: Array[Long] = Timer.DefaultPercentiles,
     reservoir: Reservoir = Timer.DefaultReservoir): Timer =
     register(TimerKey(name), new Timer(rates, percentiles, reservoir))
-  def removeTimer(name: String): Unit =
+  protected def removeTimer(name: String): Unit =
     unregister(TimerKey(name))
 
-  def histogram(
+  protected def histogram(
     name: String,
     percentiles: Array[Long] = Histogram.DefaultPercentiles,
     reservoir: Reservoir = Histogram.DefaultReservoir): Histogram =
     register(HistogramKey(name), new Histogram(percentiles, reservoir))
-  def removeHistogram(name: String): Unit =
+  protected def removeHistogram(name: String): Unit =
     unregister(HistogramKey(name))
 
-  override def collect(ctx: InstrumentContext) = {
+  final override def collect(ctx: InstrumentContext) = {
     val snapshots = Map.newBuilder[InstrumentKey, InstrumentSnapshot]
     _instruments.foreach {
       case (key, instrument) => snapshots += key -> instrument.collect(ctx)
     }
     SampleSnapshot(snapshots.result())
   }
-  override def cleanup(): Unit = _instruments.values.foreach(_.cleanup())
+  final override def cleanup(): Unit = _instruments.values.foreach(_.cleanup())
 
   private def atomicGetOrElseUpdate(key: InstrumentKey, op: => Instrument, cleanup: Instrument => Unit): Instrument = {
     _instruments.get(key) match {

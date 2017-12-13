@@ -22,7 +22,6 @@ isSnapshot in ThisBuild := true
 lazy val aggregateProjects: Seq[ProjectReference] = Seq(
   aspectj,
   core,
-  osPlugin,
   akkaPlugin,
   jdbcPlugin,
   logstashPlugin,
@@ -50,8 +49,8 @@ lazy val core = (project in file("cat4s-core"))
   .configs(IntegrationTest, MultiJvm)
   .enablePlugins(HeaderPlugin, AutomateHeaderPlugin)
 
-lazy val osPlugin = (project in file("cat4s-plugin-os"))
-  .settings(name := "cat4s-plugin-os")
+lazy val akkaPlugin = (project in file("cat4s-plugin-akka"))
+  .settings(name := "cat4s-plugin-akka")
   .settings(commonSettings: _*)
   .settings(integrationTestSettings: _*)
   .settings(libraryDependencies ++= Seq(LogbackClassic))
@@ -63,8 +62,9 @@ lazy val osPlugin = (project in file("cat4s-plugin-os"))
   .configs(IntegrationTest, MultiJvm)
   .enablePlugins(HeaderPlugin, AutomateHeaderPlugin)
 
-lazy val akkaPlugin = (project in file("cat4s-plugin-akka"))
-  .settings(name := "cat4s-plugin-akka")
+
+lazy val jmxPlugin = (project in file("cat4s-plugin-jmx"))
+  .settings(name := "cat4s-plugin-jmx")
   .settings(commonSettings: _*)
   .settings(integrationTestSettings: _*)
   .settings(libraryDependencies ++= Seq(LogbackClassic))

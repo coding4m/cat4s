@@ -88,7 +88,7 @@ class MetricRegistry(system: ExtendedActorSystem) extends Extension with MetricS
     recorder.isDefined
   }
 
-  override def subscribe(subscriber: ActorRef, filter: MetricFilter, permanently: Boolean): Unit = controller ! Subscribe(subscriber, filter, permanently)
+  override def subscribe(subscriber: ActorRef): Unit = controller ! Subscribe(subscriber)
   override def unsubscribe(subscriber: ActorRef): Unit = controller ! Unsubscribe(subscriber)
 
   override private[cat4s] def start(): Unit = {

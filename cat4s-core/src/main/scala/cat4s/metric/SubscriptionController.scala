@@ -16,7 +16,7 @@
 
 package cat4s.metric
 
-import akka.actor.{ Actor, ActorRef, Props }
+import akka.actor.{ Actor, ActorRef, Props, Stash, Terminated }
 
 /**
  * @author siuming
@@ -27,16 +27,37 @@ private[metric] object SubscriptionController {
     Props(new SubscriptionController)
   case object Process
 }
-private[metric] class SubscriptionController extends Actor {
+private[metric] class SubscriptionController extends Actor with Stash {
+  import SubscriptionProtocol._
+  import SubscriptionController._
   private var subscribers = Seq.empty[ActorRef]
-  override def receive = initiating
+
+  override def receive = initiating.orElse(terminated)
 
   private def initiating: Receive = {
-    //todo
-    case msg => println(msg)
+    case Process =>
+      context become initiated.orElse(terminated)
+      unstashAll()
+    case Subscribe(s) => if (!subscribers.contains(s)) {
+      subscribers = subscribers :+ context.watch(s)
+    }
+    case Unsubscribe(s) =>
+      subscribers = subscribers.filterNot(_ == context.unwatch(s))
+    case _ =>
+      stash()
   }
 
   private def initiated: Receive = {
-    ???
+    case Subscribe(s) => if (!subscribers.contains(s)) {
+      subscribers = subscribers :+ context.watch(s)
+    }
+    case Unsubscribe(s) =>
+      subscribers = subscribers.filterNot(_ == context.unwatch(s))
+    case snapshot: MetricSnapshot =>
+      subscribers.foreach(_ ! snapshot)
+  }
+
+  private def terminated: Receive = {
+    case Terminated(s) => subscribers = subscribers.filterNot(_ == s)
   }
 }

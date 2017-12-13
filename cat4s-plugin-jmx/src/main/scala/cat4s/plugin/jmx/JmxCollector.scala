@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package cat4s.plugin.os
+package cat4s.plugin.jmx
 
 import java.lang.management.ManagementFactory
 
 import akka.actor.{ Actor, Props }
 
 /**
- * @author siuming
- */
-private[os] object JvmCollector {
-  val Name = "jvm-collector"
-  def props(metrics: JvmMetrics): Props =
-    Props(new JvmCollector(metrics))
+  * @author siuming
+  */
+private[jmx] object JmxCollector {
+  val Name = "jmx-collector"
+  def props(metrics: JmxMetrics): Props =
+    Props(new JmxCollector(metrics))
 }
-private[os] class JvmCollector(metrics: JvmMetrics) extends Actor {
+private[jmx] class JmxCollector(metrics: JmxMetrics) extends Actor {
   import scala.collection.JavaConverters._
 
   val classCollector = ManagementFactory.getClassLoadingMXBean
@@ -54,8 +54,8 @@ private[os] class JvmCollector(metrics: JvmMetrics) extends Actor {
     metrics.daemonThreadCount.record(threadCollector.getDaemonThreadCount.toLong)
 
     garbageCollector.filter(_.isValid).foreach { gc =>
-      metrics.garbageCollectCount(gc.getName).record(gc.getCollectionCount)
-      metrics.garbageCollectTime(gc.getName).record(gc.getCollectionTime)
+      metrics.gcCount(gc.getName).record(gc.getCollectionCount)
+      metrics.gcTime(gc.getName).record(gc.getCollectionTime)
     }
   }
 }

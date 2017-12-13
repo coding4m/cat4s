@@ -29,5 +29,5 @@ object ConsolePlugin extends ExtensionId[ConsolePlugin] with ExtensionIdProvider
 class ConsolePlugin(system: ExtendedActorSystem) extends Plugin {
   val reporter = system.actorOf(ConsoleReporter.props(), ConsoleReporter.Name)
   Cat.tracer.subscribe(reporter)
-  Cat.metrics.subscribe(reporter, null, permanently = true)
+  Cat.metrics.subscribe(reporter)
 }

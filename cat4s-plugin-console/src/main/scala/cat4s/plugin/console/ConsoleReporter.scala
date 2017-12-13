@@ -17,6 +17,8 @@
 package cat4s.plugin.console
 
 import akka.actor.{ Actor, Props }
+import cat4s.metric.MetricSnapshot
+import cat4s.trace.TraceSample
 
 /**
  * @author siuming
@@ -28,6 +30,7 @@ object ConsoleReporter {
 }
 class ConsoleReporter extends Actor {
   override def receive = {
-    case _ =>
+    case snapshot: MetricSnapshot => println(snapshot) //todo
+    case snapshot: TraceSample    => println(snapshot) //todo
   }
 }

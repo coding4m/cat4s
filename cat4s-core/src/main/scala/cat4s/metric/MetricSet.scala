@@ -70,7 +70,7 @@ trait MetricSet {
   def removeSample(name: String, catelog: String, tags: Seq[String]): Boolean = removeSample(Sample(name, catelog, tags))
   def removeSample(sample: Sample): Boolean
 
-  def subscribe(subscriber: ActorRef, filter: MetricFilter, permanently: Boolean): Unit
+  def subscribe(subscriber: ActorRef): Unit
   def unsubscribe(subscriber: ActorRef): Unit
 
   private[cat4s] def start()

@@ -30,13 +30,13 @@ object Cat {
   @volatile private var instance = new Instance()
 
   def tracer: TraceSet = {
-    val _tracer = instance.tracer
-    if (null == _tracer) throw new CatException("cat must been started.") else _tracer
+    val tracer = instance.tracer
+    if (null == tracer) throw new CatException("cat must been started.") else tracer
   }
 
   def metrics: MetricSet = {
-    val _metrics = instance.metrics
-    if (null == _metrics) throw new CatException("cat must been started.") else _metrics
+    val metrics = instance.metrics
+    if (null == metrics) throw new CatException("cat must been started.") else metrics
   }
 
   def start(): Unit = {
@@ -63,10 +63,10 @@ object Cat {
     }
 
     def start(config: Config): Unit = this.synchronized {
-      actorSystem = ActorSystem(Name, config.withOnlyPath(Name))
+      actorSystem = ActorSystem(Name, config)
       tracer = actorSystem.registerExtension(TraceRegistry)
       metrics = actorSystem.registerExtension(MetricRegistry)
-      actorSystem.registerExtension(PluginRegistry)
+      actorSystem.registerExtension(PluginLoader)
       tracer.start()
       metrics.start()
       started = true

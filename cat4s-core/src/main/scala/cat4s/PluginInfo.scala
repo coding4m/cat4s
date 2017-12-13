@@ -19,6 +19,4 @@ package cat4s
 /**
  * @author siuming
  */
-private[cat4s] class PluginInfo {
-
-}
+private[cat4s] case class PluginInfo(name: String, aspectJRequired: Boolean, entryPoint: String)

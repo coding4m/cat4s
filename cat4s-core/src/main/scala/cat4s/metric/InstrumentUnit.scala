@@ -19,6 +19,5 @@ package cat4s.metric
 /**
  * @author siuming
  */
-class InstrumentUnit {
-
+trait InstrumentUnit {
 }

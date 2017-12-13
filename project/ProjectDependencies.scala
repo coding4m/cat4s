@@ -22,6 +22,7 @@ object ProjectDependencyVersions {
   val Json4sVersion = "3.5.3"
   val FlumeVersion = "1.8.0"
   val AkkaVersion = "2.5.4"
+  val AspectJVersion = "1.8.13"
 }
 
 object ProjectDependencies {
@@ -45,5 +46,7 @@ object ProjectDependencies {
   val Flume =  "org.apache.flume" % "flume-ng-sdk" % FlumeVersion
 
   val AkkaActor =            "com.typesafe.akka"         %% "akka-actor"                % AkkaVersion
+  val AspectJRuntime =       "org.aspectj" % "aspectjrt" % AspectJVersion
+  val AspectJWeaver =        "org.aspectj" % "aspectjweaver" % AspectJVersion
 }
 

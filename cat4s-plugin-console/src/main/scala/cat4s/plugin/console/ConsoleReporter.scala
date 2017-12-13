@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package cat4s.plugin.os
+package cat4s.plugin.console
 
-import akka.actor.{ ExtendedActorSystem, ExtensionId, ExtensionIdProvider }
-import cat4s.{ Cat, Plugin }
+import akka.actor.{ Actor, Props }
 
 /**
  * @author siuming
  */
-object OsPlugin extends ExtensionId[OsPlugin] with ExtensionIdProvider {
-  override def lookup() = OsPlugin
-  override def createExtension(system: ExtendedActorSystem) = new OsPlugin(system)
+object ConsoleReporter {
+  val Name = "console-reporter"
+  def props(): Props =
+    Props(new ConsoleReporter)
 }
-class OsPlugin(system: ExtendedActorSystem) extends Plugin {
-  system.actorOf(JvmCollector.props(Cat.metrics.sample(JvmMetrics, "jvm")), JvmCollector.Name)
-  system.actorOf(SysCollector.props(Cat.metrics.sample(SysMetrics, "sys")), SysCollector.Name)
+class ConsoleReporter extends Actor {
+  override def receive = {
+    case _ =>
+  }
 }

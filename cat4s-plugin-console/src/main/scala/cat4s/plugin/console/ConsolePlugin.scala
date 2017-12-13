@@ -27,6 +27,7 @@ object ConsolePlugin extends ExtensionId[ConsolePlugin] with ExtensionIdProvider
   override def createExtension(system: ExtendedActorSystem) = new ConsolePlugin(system)
 }
 class ConsolePlugin(system: ExtendedActorSystem) extends Plugin {
-  Cat.tracer.subscribe(null)
-  Cat.metrics.subscribe(null, null, permanently = true)
+  val reporter = system.actorOf(ConsoleReporter.props(), ConsoleReporter.Name)
+  Cat.tracer.subscribe(reporter)
+  Cat.metrics.subscribe(reporter, null, permanently = true)
 }

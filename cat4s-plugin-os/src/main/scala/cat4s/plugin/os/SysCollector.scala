@@ -16,17 +16,16 @@
 
 package cat4s.plugin.os
 
-import akka.actor.{ ExtendedActorSystem, ExtensionId, ExtensionIdProvider }
-import cat4s.{ Cat, Plugin }
+import akka.actor.{ Actor, Props }
 
 /**
  * @author siuming
  */
-object OsPlugin extends ExtensionId[OsPlugin] with ExtensionIdProvider {
-  override def lookup() = OsPlugin
-  override def createExtension(system: ExtendedActorSystem) = new OsPlugin(system)
+private[os] object SysCollector {
+  val Name = "sys-collector"
+  def props(metrics: SysMetrics): Props =
+    Props(new SysCollector(metrics))
 }
-class OsPlugin(system: ExtendedActorSystem) extends Plugin {
-  system.actorOf(JvmCollector.props(Cat.metrics.sample(JvmMetrics, "jvm")), JvmCollector.Name)
-  system.actorOf(SysCollector.props(Cat.metrics.sample(SysMetrics, "sys")), SysCollector.Name)
+private[os] class SysCollector(metrics: SysMetrics) extends Actor {
+  override def receive = ???
 }

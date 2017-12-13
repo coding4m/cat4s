@@ -16,17 +16,9 @@
 
 package cat4s.plugin.os
 
-import akka.actor.{ ExtendedActorSystem, ExtensionId, ExtensionIdProvider }
-import cat4s.{ Cat, Plugin }
-
 /**
  * @author siuming
  */
-object OsPlugin extends ExtensionId[OsPlugin] with ExtensionIdProvider {
-  override def lookup() = OsPlugin
-  override def createExtension(system: ExtendedActorSystem) = new OsPlugin(system)
-}
-class OsPlugin(system: ExtendedActorSystem) extends Plugin {
-  system.actorOf(JvmCollector.props(Cat.metrics.sample(JvmMetrics, "jvm")), JvmCollector.Name)
-  system.actorOf(SysCollector.props(Cat.metrics.sample(SysMetrics, "sys")), SysCollector.Name)
+class OsPluginSettings {
+
 }

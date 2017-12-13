@@ -16,17 +16,15 @@
 
 package cat4s.plugin.os
 
-import akka.actor.{ ExtendedActorSystem, ExtensionId, ExtensionIdProvider }
-import cat4s.{ Cat, Plugin }
+import cat4s.metric.{ SampleRecorderBase, SampleRecorderFactory }
 
 /**
  * @author siuming
  */
-object OsPlugin extends ExtensionId[OsPlugin] with ExtensionIdProvider {
-  override def lookup() = OsPlugin
-  override def createExtension(system: ExtendedActorSystem) = new OsPlugin(system)
+private[os] object SysMetrics extends SampleRecorderFactory[SysMetrics] {
+  override def catalog = "os"
+  override def createRecorder() = new SysMetrics()
 }
-class OsPlugin(system: ExtendedActorSystem) extends Plugin {
-  system.actorOf(JvmCollector.props(Cat.metrics.sample(JvmMetrics, "jvm")), JvmCollector.Name)
-  system.actorOf(SysCollector.props(Cat.metrics.sample(SysMetrics, "sys")), SysCollector.Name)
+private[os] class SysMetrics extends SampleRecorderBase {
+
 }

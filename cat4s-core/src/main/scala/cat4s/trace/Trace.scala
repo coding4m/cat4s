@@ -55,7 +55,7 @@ object Trace {
       assert(_segments.forall(_.isCompleted), "segments must all completed.")
       this._status = status
       this._clock = this._clock.copy(elapsedNano = System.nanoTime() - this.startNano)
-      dispatcher ! TraceSample(
+      dispatcher ! TraceInfo(
         traceId,
         parentId,
         id,
@@ -68,7 +68,7 @@ object Trace {
         clock.elapsedNano,
         source.host,
         source.port,
-        _segments.map(it => SegmentSample(it.name, it.data, it.status.status, it.status.message, it.clock.startTime, it.clock.elapsedNano))
+        _segments.map(it => SegmentInfo(it.name, it.data, it.status.status, it.status.message, it.clock.startTime, it.clock.elapsedNano))
       )
     }
     override def newSegment(name: String, data: Map[String, String]): Segment = {

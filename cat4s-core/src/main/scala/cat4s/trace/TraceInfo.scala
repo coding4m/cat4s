@@ -19,7 +19,7 @@ package cat4s.trace
 /**
  * @author siuming
  */
-case class TraceSample(
+case class TraceInfo(
   traceId: String,
   parentId: Option[String],
   id: String,
@@ -32,5 +32,5 @@ case class TraceSample(
   elapsedNano: Long,
   sourceHost: String,
   sourcePort: Int,
-  segments: Seq[SegmentSample]
+  segments: Seq[SegmentInfo]
 )

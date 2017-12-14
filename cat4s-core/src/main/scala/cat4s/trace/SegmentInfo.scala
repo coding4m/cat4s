@@ -19,7 +19,7 @@ package cat4s.trace
 /**
  * @author siuming
  */
-case class SegmentSample(
+case class SegmentInfo(
   name: String,
   data: Map[String, String],
   status: Int,

@@ -18,29 +18,44 @@ package cat4s.plugin.jmx
 
 import java.lang.management.ManagementFactory
 
-import akka.actor.{ Actor, Props }
+import akka.actor.{ Actor, Cancellable, Props }
+
+import scala.concurrent.duration.FiniteDuration
 
 /**
-  * @author siuming
-  */
+ * @author siuming
+ */
 private[jmx] object JmxCollector {
   val Name = "jmx-collector"
-  def props(metrics: JmxMetrics): Props =
-    Props(new JmxCollector(metrics))
+  def props(collectInterval: FiniteDuration, metrics: JmxMetrics): Props =
+    Props(new JmxCollector(collectInterval, metrics))
+
+  case object Collect
 }
-private[jmx] class JmxCollector(metrics: JmxMetrics) extends Actor {
+private[jmx] class JmxCollector(collectInterval: FiniteDuration, metrics: JmxMetrics) extends Actor {
   import scala.collection.JavaConverters._
+  import JmxCollector.Collect
 
   val classCollector = ManagementFactory.getClassLoadingMXBean
   val memoryCollector = ManagementFactory.getMemoryMXBean
   val threadCollector = ManagementFactory.getThreadMXBean
   val garbageCollector = ManagementFactory.getGarbageCollectorMXBeans.asScala
 
+  var collectScheduler: Option[Cancellable] = None
+
   override def receive = {
-    case _ =>
+    case Collect => collect()
   }
 
-  override def preStart(): Unit = collect()
+  override def preStart(): Unit = {
+    import context.dispatcher
+    collect()
+    collectScheduler = Some(context.system.scheduler.schedule(collectInterval, collectInterval, self, Collect))
+  }
+
+  override def postStop(): Unit = {
+    collectScheduler.foreach(_.cancel())
+  }
 
   private def collect(): Unit = {
     metrics.classesLoaded.record(classCollector.getLoadedClassCount.toLong)

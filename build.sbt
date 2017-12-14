@@ -73,6 +73,7 @@ lazy val jmxPlugin = (project in file("cat4s-plugin-jmx"))
   .settings(libraryDependencies ++= Seq(Javaslang % "test", JunitInterface % "test", Scalatest % "test,it"))
   .settings(integrationTestPublishSettings: _*)
   .dependsOn(core)
+  .dependsOn(consolePlugin % "test")
   .configs(IntegrationTest, MultiJvm)
   .enablePlugins(HeaderPlugin, AutomateHeaderPlugin)
 

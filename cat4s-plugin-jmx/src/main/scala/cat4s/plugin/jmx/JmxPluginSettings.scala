@@ -16,17 +16,16 @@
 
 package cat4s.plugin.jmx
 
-import akka.actor.{ ExtendedActorSystem, ExtensionId, ExtensionIdProvider }
-import cat4s.{ Cat, Plugin }
+import java.util.concurrent.TimeUnit
+
+import com.typesafe.config.Config
+import scala.concurrent.duration._
 
 /**
  * @author siuming
  */
-object JmxPlugin extends ExtensionId[JmxPlugin] with ExtensionIdProvider {
-  override def lookup() = JmxPlugin
-  override def createExtension(system: ExtendedActorSystem) = new JmxPlugin(system)
-}
-class JmxPlugin(system: ExtendedActorSystem) extends Plugin {
-  val settings = new JmxPluginSettings(system.settings.config)
-  system.actorOf(JmxCollector.props(settings.collectInterval, Cat.metrics.sample(JmxMetrics, "metrics")))
+class JmxPluginSettings(config: Config) {
+
+  val collectInterval =
+    config.getDuration("cat.metrics.collect-interval", TimeUnit.MILLISECONDS).millis
 }

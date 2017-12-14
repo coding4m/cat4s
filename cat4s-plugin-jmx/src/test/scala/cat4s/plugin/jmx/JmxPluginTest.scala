@@ -16,17 +16,27 @@
 
 package cat4s.plugin.jmx
 
-import akka.actor.{ ExtendedActorSystem, ExtensionId, ExtensionIdProvider }
-import cat4s.{ Cat, Plugin }
+import cat4s.Cat
+
+import scala.io.Source
 
 /**
  * @author siuming
  */
-object JmxPlugin extends ExtensionId[JmxPlugin] with ExtensionIdProvider {
-  override def lookup() = JmxPlugin
-  override def createExtension(system: ExtendedActorSystem) = new JmxPlugin(system)
-}
-class JmxPlugin(system: ExtendedActorSystem) extends Plugin {
-  val settings = new JmxPluginSettings(system.settings.config)
-  system.actorOf(JmxCollector.props(settings.collectInterval, Cat.metrics.sample(JmxMetrics, "metrics")))
+object JmxPluginTest extends App {
+
+  val lines = Source.stdin.getLines
+
+  Cat.start()
+  prompt()
+
+  private def prompt(): Unit = {
+    if (lines.hasNext) lines.next() match {
+      case "exit" =>
+        Cat.stop()
+        System.exit(0)
+      case _ =>
+        prompt()
+    }
+  }
 }

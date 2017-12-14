@@ -1,0 +1,10 @@
+<!DOCTYPE aspectj PUBLIC "-//AspectJ//DTD//EN" "http://www.eclipse.org/aspectj/dtd/aspectj.dtd">
+<aspectj>
+  <aspects>
+    <!-- Notify that AspectJ is present -->
+    <aspect name="cat4s.PluginAspect"/>
+  </aspects>
+  <weaver>
+    <include within="cat4s..*"/>
+  </weaver>
+</aspectj>

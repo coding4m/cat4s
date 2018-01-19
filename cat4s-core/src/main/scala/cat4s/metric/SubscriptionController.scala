@@ -53,7 +53,7 @@ private[metric] class SubscriptionController extends Actor with Stash {
     }
     case Unsubscribe(s) =>
       subscribers = subscribers.filterNot(_ == context.unwatch(s))
-    case snapshot: MetricSnapshot =>
+    case snapshot: MetricInfo =>
       subscribers.foreach(_ ! snapshot)
   }
 

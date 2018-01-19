@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package cat4s.metric
+package cat.plugin.logstash
 
 /**
  * @author siuming
  */
-case class MetricSnapshot(metrics: Map[Sample, SampleSnapshot])
+trait StashPort {
+
+}

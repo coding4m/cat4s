@@ -14,23 +14,20 @@
  * limitations under the License.
  */
 
-package cat4s.plugin.console
+package cat.plugin.logstash
 
-import akka.actor.{ Actor, Props }
-import cat4s.metric.MetricInfo
-import cat4s.trace.TraceInfo
+import akka.actor.{ ExtendedActorSystem, ExtensionId, ExtensionIdProvider }
+import cat4s.{ Cat, Plugin }
 
 /**
  * @author siuming
  */
-object ConsoleReporter {
-  val Name = "console-reporter"
-  def props(): Props =
-    Props(new ConsoleReporter)
+object LogStashPlugin extends ExtensionId[LogStashPlugin] with ExtensionIdProvider {
+  override def lookup() = LogStashPlugin
+  override def createExtension(system: ExtendedActorSystem) = new LogStashPlugin(system)
 }
-class ConsoleReporter extends Actor {
-  override def receive = {
-    case info: TraceInfo  => println(info) //todo
-    case info: MetricInfo => println(info) //todo
-  }
+class LogStashPlugin(system: ExtendedActorSystem) extends Plugin {
+  val reporter = system.actorOf(LogStashReporter.props(), LogStashReporter.Name)
+  Cat.tracer.subscribe(reporter)
+  Cat.metrics.subscribe(reporter)
 }

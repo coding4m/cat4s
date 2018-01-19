@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cat4s.plugin.console
+package cat.plugin.logstash
 
 import akka.actor.{ Actor, Props }
 import cat4s.metric.MetricInfo
@@ -23,14 +23,15 @@ import cat4s.trace.TraceInfo
 /**
  * @author siuming
  */
-object ConsoleReporter {
-  val Name = "console-reporter"
+object LogStashReporter {
+  val Name = "logstash-reporter"
   def props(): Props =
-    Props(new ConsoleReporter)
+    Props(new LogStashReporter)
 }
-class ConsoleReporter extends Actor {
+class LogStashReporter extends Actor {
+  private val settings = new LogStashSettings(context.system.settings.config)
   override def receive = {
-    case info: TraceInfo  => println(info) //todo
-    case info: MetricInfo => println(info) //todo
+    case info: TraceInfo  =>
+    case info: MetricInfo =>
   }
 }

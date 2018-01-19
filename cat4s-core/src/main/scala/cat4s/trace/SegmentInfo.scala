@@ -24,5 +24,5 @@ case class SegmentInfo(
   data: Map[String, String],
   status: Int,
   message: String,
-  startTime: Long,
-  elapsedNano: Long)
+  startMillis: Long,
+  elapsedNanos: Long)

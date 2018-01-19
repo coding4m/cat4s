@@ -28,9 +28,7 @@ case class TraceInfo(
   data: Map[String, String],
   status: Int,
   message: String,
-  startTime: Long,
-  elapsedNano: Long,
-  sourceHost: String,
-  sourcePort: Int,
+  startMillis: Long,
+  elapsedNanos: Long,
   segments: Seq[SegmentInfo]
 )

@@ -27,16 +27,11 @@ object TraceRegistry extends ExtensionId[TraceRegistry] with ExtensionIdProvider
 class TraceRegistry(system: ExtendedActorSystem) extends Extension with TraceSet {
   import SubscriptionProtocol._
   import SubscriptionController._
+  private val controller = system.actorOf(SubscriptionController.props(), SubscriptionController.Name)
 
-  private val settings = new TraceSettings(system.settings.config)
-  private val dispatcher = system.actorOf(SubscriptionController.props(), SubscriptionController.Name)
-
-  override val defaultHost = settings.defaultHost
-  override val defaultPort = settings.defaultPort
-
-  override def trace(name: String, source: TraceSource): Trace = new Trace(name, source, dispatcher)
-  override def subscribe(subscriber: ActorRef): Unit = dispatcher ! Subscribe(subscriber)
-  override def unsubscribe(subscriber: ActorRef): Unit = dispatcher ! Unsubscribe(subscriber)
-  override private[cat4s] def start(): Unit = dispatcher ! Process
+  override def trace(name: String): Trace = new Trace(name, controller)
+  override def subscribe(subscriber: ActorRef): Unit = controller ! Subscribe(subscriber)
+  override def unsubscribe(subscriber: ActorRef): Unit = controller ! Unsubscribe(subscriber)
+  override private[cat4s] def start(): Unit = controller ! Process
   override private[cat4s] def stop(): Unit = {}
 }

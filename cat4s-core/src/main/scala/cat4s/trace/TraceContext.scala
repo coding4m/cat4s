@@ -30,7 +30,6 @@ trait TraceContext {
   def data: Map[String, String]
   def clock: TraceClock
   def status: TraceStatus
-  def source: TraceSource
 
   def isSuccess: Boolean = isCompleted && status.status == TraceStatus.Ok
   def isCompleted: Boolean = null != status

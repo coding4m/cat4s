@@ -25,28 +25,13 @@ import scala.concurrent.{ ExecutionContext, Future }
  */
 trait TraceSet {
 
-  def defaultHost: String
-  def defaultPort: Int
-
-  def trace(name: String): Trace = trace(name, defaultHost, defaultPort)
-  def trace(name: String, host: String, port: Int): Trace = trace(name, TraceSource(host, port))
-  def trace(name: String, source: TraceSource): Trace
-
-  def withContext[T](name: String)(f: TraceContext => T): T = withContext(name, TraceSource(defaultHost, defaultPort))(f)
-  def withContext[T](name: String, source: TraceSource)(f: TraceContext => T): T = withContext(name, source, None)(f)
-  def withContext[T](name: String, source: TraceSource, traceId: Option[String])(f: TraceContext => T): T = withContext(name, source, traceId, None)(f)
-  def withContext[T](name: String, source: TraceSource, traceId: Option[String], parentId: Option[String])(f: TraceContext => T): T = trace(name, source).withTraceId(traceId).withParentId(parentId)(f)
-  def withContext[T](name: String, host: String, port: Int)(f: TraceContext => T): T = withContext(name, host, port, None)(f)
-  def withContext[T](name: String, host: String, port: Int, traceId: Option[String])(f: TraceContext => T): T = withContext(name, TraceSource(host, port), traceId, None)(f)
-  def withContext[T](name: String, host: String, port: Int, traceId: Option[String], parentId: Option[String])(f: TraceContext => T): T = withContext(name, TraceSource(host, port), traceId, parentId)(f)
-
-  def withAsyncContext[T](name: String)(f: TraceContext => Future[T])(implicit ec: ExecutionContext): Future[T] = withAsyncContext(name, TraceSource(defaultHost, defaultPort))(f)
-  def withAsyncContext[T](name: String, source: TraceSource)(f: TraceContext => Future[T])(implicit ec: ExecutionContext): Future[T] = withAsyncContext(name, source, None)(f)
-  def withAsyncContext[T](name: String, source: TraceSource, traceId: Option[String])(f: TraceContext => Future[T])(implicit ec: ExecutionContext): Future[T] = withAsyncContext(name, source, traceId, None)(f)
-  def withAsyncContext[T](name: String, source: TraceSource, traceId: Option[String], parentId: Option[String])(f: TraceContext => Future[T])(implicit ec: ExecutionContext): Future[T] = trace(name, source).withTraceId(traceId).withParentId(parentId).collect(f)
-  def withAsyncContext[T](name: String, host: String, port: Int)(f: TraceContext => Future[T])(implicit ec: ExecutionContext): Future[T] = withAsyncContext(name, host, port, None)(f)
-  def withAsyncContext[T](name: String, host: String, port: Int, traceId: Option[String])(f: TraceContext => Future[T])(implicit ec: ExecutionContext): Future[T] = withAsyncContext(name, host, port, traceId, None)(f)
-  def withAsyncContext[T](name: String, host: String, port: Int, traceId: Option[String], parentId: Option[String])(f: TraceContext => Future[T])(implicit ec: ExecutionContext): Future[T] = withAsyncContext(name, TraceSource(host, port), traceId, parentId)(f)
+  def trace(name: String): Trace
+  def withContext[T](name: String)(f: TraceContext => T): T = withContext(name, None)(f)
+  def withContext[T](name: String, traceId: Option[String])(f: TraceContext => T): T = withContext(name, traceId, None)(f)
+  def withContext[T](name: String, traceId: Option[String], parentId: Option[String])(f: TraceContext => T): T = trace(name).withTraceId(traceId).withParentId(parentId)(f)
+  def withAsyncContext[T](name: String)(f: TraceContext => Future[T])(implicit ec: ExecutionContext): Future[T] = withAsyncContext(name, None)(f)
+  def withAsyncContext[T](name: String, traceId: Option[String])(f: TraceContext => Future[T])(implicit ec: ExecutionContext): Future[T] = withAsyncContext(name, traceId, None)(f)
+  def withAsyncContext[T](name: String, traceId: Option[String], parentId: Option[String])(f: TraceContext => Future[T])(implicit ec: ExecutionContext): Future[T] = trace(name).withTraceId(traceId).withParentId(parentId).collect(f)
 
   def subscribe(subscriber: ActorRef): Unit
   def unsubscribe(subscriber: ActorRef): Unit

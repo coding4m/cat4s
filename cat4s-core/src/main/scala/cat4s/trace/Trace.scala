@@ -38,23 +38,22 @@ object Trace {
     name: String,
     tags: Seq[String],
     data: Map[String, String],
-    source: TraceSource,
     handler: TraceHandler,
     dispatcher: ActorRef) extends TraceContext {
     private val startTime = System.currentTimeMillis()
-    private val startNano = System.nanoTime()
+    private val startNanos = System.nanoTime()
 
-    @volatile private var _status: TraceStatus = _
     @volatile private var _segments: Seq[Segment] = Seq.empty
-    @volatile private var _clock: TraceClock = TraceClock(startTime = startTime, elapsedNano = 0L)
+    @volatile private var _status: TraceStatus = _
+    @volatile private var _clock: TraceClock = TraceClock(startMillis = startTime, elapsedNanos = 0L)
 
-    @inline override def status = _status
     @inline override def clock = _clock
+    @inline override def status = _status
     override def complete(status: TraceStatus): Unit = {
       assert(!isCompleted, "context has been completed.")
       assert(_segments.forall(_.isCompleted), "segments must all completed.")
       this._status = status
-      this._clock = this._clock.copy(elapsedNano = System.nanoTime() - this.startNano)
+      this._clock = this._clock.copy(elapsedNanos = System.nanoTime() - this.startNanos)
       dispatcher ! TraceInfo(
         traceId,
         parentId,
@@ -64,11 +63,9 @@ object Trace {
         data,
         status.status,
         status.message,
-        clock.startTime,
-        clock.elapsedNano,
-        source.host,
-        source.port,
-        _segments.map(it => SegmentInfo(it.name, it.data, it.status.status, it.status.message, it.clock.startTime, it.clock.elapsedNano))
+        clock.startMillis,
+        clock.elapsedNanos,
+        _segments.map(it => SegmentInfo(it.name, it.data, it.status.status, it.status.message, it.clock.startMillis, it.clock.elapsedNanos))
       )
     }
     override def newSegment(name: String, data: Map[String, String]): Segment = {
@@ -80,16 +77,16 @@ object Trace {
 
   private case class DefaultSegment(name: String, data: Map[String, String], handler: TraceHandler) extends Segment {
     private val startTime = System.currentTimeMillis()
-    private val startNano = System.nanoTime()
+    private val startNanos = System.nanoTime()
 
     @volatile private var _status: TraceStatus = _
-    @volatile private var _clock: TraceClock = TraceClock(startTime = startTime, elapsedNano = -1L)
+    @volatile private var _clock: TraceClock = TraceClock(startMillis = startTime, elapsedNanos = -1L)
     @inline override def status = _status
     @inline override def clock = _clock
     override def complete(status: TraceStatus): Unit = {
       assert(!isCompleted, "segment has been completed.")
       this._status = status
-      this._clock = this._clock.copy(elapsedNano = System.nanoTime() - startNano)
+      this._clock = this._clock.copy(elapsedNanos = System.nanoTime() - startNanos)
     }
 
     override def apply[T](f: => T) = {
@@ -112,7 +109,7 @@ object Trace {
     }
   }
 }
-class Trace private[trace] (name: String, source: TraceSource, dispatcher: ActorRef) {
+class Trace private[trace] (name: String, dispatcher: ActorRef) {
   import Trace._
 
   private var traceId: Option[String] = None
@@ -197,7 +194,6 @@ class Trace private[trace] (name: String, source: TraceSource, dispatcher: Actor
     name,
     tags,
     data,
-    source,
     handler,
     dispatcher
   )

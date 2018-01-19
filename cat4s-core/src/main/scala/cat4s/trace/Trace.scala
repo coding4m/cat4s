@@ -39,7 +39,7 @@ object Trace {
     tags: Seq[String],
     data: Map[String, String],
     handler: TraceHandler,
-    dispatcher: ActorRef) extends TraceContext {
+    controller: ActorRef) extends TraceContext {
     private val startTime = System.currentTimeMillis()
     private val startNanos = System.nanoTime()
 
@@ -54,7 +54,7 @@ object Trace {
       assert(_segments.forall(_.isCompleted), "segments must all completed.")
       this._status = status
       this._clock = this._clock.copy(elapsedNanos = System.nanoTime() - this.startNanos)
-      dispatcher ! TraceInfo(
+      controller ! TraceInfo(
         traceId,
         parentId,
         id,
@@ -109,7 +109,7 @@ object Trace {
     }
   }
 }
-class Trace private[trace] (name: String, dispatcher: ActorRef) {
+class Trace private[trace] (name: String, controller: ActorRef) {
   import Trace._
 
   private var traceId: Option[String] = None
@@ -195,6 +195,6 @@ class Trace private[trace] (name: String, dispatcher: ActorRef) {
     tags,
     data,
     handler,
-    dispatcher
+    controller
   )
 }

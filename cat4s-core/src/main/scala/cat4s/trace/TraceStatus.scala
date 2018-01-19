@@ -21,7 +21,7 @@ package cat4s.trace
  */
 object TraceStatus {
   val Ok = 0
-  val OkMsg = "ok."
+  val OkMsg = "ok"
   val OkStatus = TraceStatus()
 }
 case class TraceStatus(status: Int = TraceStatus.Ok, message: String = TraceStatus.OkMsg)

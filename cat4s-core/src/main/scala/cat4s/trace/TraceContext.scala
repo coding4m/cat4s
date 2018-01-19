@@ -31,14 +31,14 @@ trait TraceContext {
   def clock: TraceClock
   def status: TraceStatus
 
-  def isSuccess: Boolean = isCompleted && status.status == TraceStatus.Ok
-  def isCompleted: Boolean = null != status
-  def complete(status: TraceStatus): Unit
-
   def newSegment(name: String): Segment = newSegment(name, Map.empty[String, String])
   def newSegment(name: String, data: Map[String, String]): Segment
   def withSegment[T](name: String)(f: => T): T = withSegment(name, Map.empty)(f)
   def withSegment[T](name: String, data: Map[String, String])(f: => T): T = newSegment(name, data)(f)
   def withAsyncSegment[T](name: String)(f: => Future[T])(implicit ec: ExecutionContext): Future[T] = withAsyncSegment(name, Map.empty)(f)
   def withAsyncSegment[T](name: String, data: Map[String, String])(f: => Future[T])(implicit ec: ExecutionContext): Future[T] = withAsyncSegment(name, data)(f)
+
+  def complete(status: TraceStatus): Unit
+  def isSuccess: Boolean = isCompleted && status.status == TraceStatus.Ok
+  def isCompleted: Boolean = null != status
 }

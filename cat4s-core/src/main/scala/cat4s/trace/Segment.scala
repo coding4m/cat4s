@@ -27,10 +27,10 @@ trait Segment {
   def clock: TraceClock
   def status: TraceStatus
 
-  def isSuccess: Boolean = isCompleted && status.status == TraceStatus.Ok
-  def isCompleted: Boolean = null != status
-  def complete(status: TraceStatus): Unit
-
   def apply[T](f: => T): T
   def collect[T](f: => Future[T])(implicit ec: ExecutionContext): Future[T]
+
+  def complete(status: TraceStatus): Unit
+  def isSuccess: Boolean = isCompleted && status.status == TraceStatus.Ok
+  def isCompleted: Boolean = null != status
 }

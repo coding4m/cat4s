@@ -22,7 +22,7 @@ import akka.actor.{ Actor, ActorRef, Props, Stash, Terminated }
  * @author siuming
  */
 private[metric] object SubscriptionController {
-  val Name = "metrics-subscription-controller"
+  val Name = "metrics-subscriptions"
   def props(): Props =
     Props(new SubscriptionController)
   case object Process

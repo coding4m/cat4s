@@ -16,9 +16,14 @@
 
 package cat4s.trace
 
+import com.typesafe.config.Config
+
 /**
  * @author siuming
  */
-class TraceSettings {
-
+class TraceSettings(config: Config) {
+  val defaultHost =
+    config.getString("cat.traces.default-host")
+  val defaultPort =
+    config.getInt("cat.traces.default-port")
 }

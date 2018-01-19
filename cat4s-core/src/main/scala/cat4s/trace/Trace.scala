@@ -105,7 +105,7 @@ object Trace {
     }
 
     override def collect[T](f: => Future[T])(implicit ec: ExecutionContext) = {
-      f.andThen {
+      f andThen {
         case Success(_) => complete(TraceStatus.OkStatus)
         case Failure(e) => complete(handler.resolve(e))
       }
@@ -184,7 +184,7 @@ class Trace private[trace] (name: String, source: TraceSource, dispatcher: Actor
 
   def collect[T](f: TraceContext => Future[T])(implicit ec: ExecutionContext): Future[T] = {
     val ctx = buildContext()
-    f(ctx).andThen {
+    f(ctx) andThen {
       case Success(_) => ctx.complete(TraceStatus.OkStatus)
       case Failure(e) => ctx.complete(handler.resolve(e))
     }

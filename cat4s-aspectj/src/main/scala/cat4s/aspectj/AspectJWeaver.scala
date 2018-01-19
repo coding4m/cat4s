@@ -19,6 +19,6 @@ package cat4s.aspectj
 /**
  * @author siuming
  */
-class AspectWeaver {
+class AspectJWeaver {
 
 }

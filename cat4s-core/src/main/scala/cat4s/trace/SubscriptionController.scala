@@ -22,7 +22,7 @@ import akka.actor.{ Actor, ActorRef, Props, Stash, Terminated }
  * @author siuming
  */
 private[trace] object SubscriptionController {
-  val Name = "trace-subscription-controller"
+  val Name = "trace-subscriptions"
   def props(): Props =
     Props(new SubscriptionController)
 

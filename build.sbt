@@ -23,6 +23,7 @@ lazy val aggregateProjects: Seq[ProjectReference] = Seq(
   aspectj,
   core,
   akkaPlugin,
+  jmxPlugin,
   jdbcPlugin,
   logstashPlugin,
   consolePlugin

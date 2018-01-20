@@ -21,6 +21,9 @@ import cat4s.metric.{ MetricRegistry, MetricSet }
 import cat4s.trace.{ TraceRegistry, TraceSet }
 import com.typesafe.config.{ Config, ConfigFactory }
 
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
+
 /**
  * @author siuming
  */
@@ -54,8 +57,8 @@ object Cat {
 
   private class Instance {
     var actorSystem: ActorSystem = _
-    var tracer: TraceSet = _
     var metrics: MetricSet = _
+    var tracer: TraceSet = _
     var started = false
 
     def start(): Unit = {
@@ -64,18 +67,18 @@ object Cat {
 
     def start(config: Config): Unit = this.synchronized {
       actorSystem = ActorSystem(Name, config)
-      tracer = actorSystem.registerExtension(TraceRegistry)
       metrics = actorSystem.registerExtension(MetricRegistry)
+      tracer = actorSystem.registerExtension(TraceRegistry)
       actorSystem.registerExtension(PluginLoader)
-      tracer.start()
       metrics.start()
+      tracer.start()
       started = true
     }
 
     def stop(): Unit = this.synchronized {
       if (started) {
         started = false
-        actorSystem.terminate()
+        Await.result(actorSystem.terminate(), Duration.Inf)
       }
     }
   }

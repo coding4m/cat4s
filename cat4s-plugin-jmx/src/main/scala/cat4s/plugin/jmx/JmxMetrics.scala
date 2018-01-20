@@ -25,15 +25,15 @@ private[jmx] object JmxMetrics extends SampleRecorderFactory[JmxMetrics] {
   val MinorGC = "minor"
   val MajorGC = "major"
   val GCNames = Map(
-    "Copy" -> MinorGC ,// Serial -XX:+UseSerialGC
-    "ParNew" -> MinorGC,// CMS -XX:+UseParNewGC
+    "Copy" -> MinorGC, // Serial -XX:+UseSerialGC
+    "ParNew" -> MinorGC, // CMS -XX:+UseParNewGC
     "PS Scavenge" -> MinorGC, // Throughput -XX:+UseParallelGC
     "G1 Young Generation" -> MinorGC, // G1 -XX:+UseG1GC
 
-    "MarkSweepCompact" -> MajorGC ,// Serial -XX:+UseSerialGC
-    "ConcurrentMarkSweep" -> MajorGC,// CMS -XX:+UseConcMarkSweepGC
+    "MarkSweepCompact" -> MajorGC, // Serial -XX:+UseSerialGC
+    "ConcurrentMarkSweep" -> MajorGC, // CMS -XX:+UseConcMarkSweepGC
     "PS MarkSweep" -> MajorGC, // Throughput -XX:+UseParallelGC and (-XX:+UseParallelOldGC or -XX:+UseParallelOldGCCompacting)
-    "G1 Old Generation" -> MajorGC, // G1 -XX:+UseG1GC
+    "G1 Old Generation" -> MajorGC // G1 -XX:+UseG1GC
   )
 
   override def catalog = "jmx"

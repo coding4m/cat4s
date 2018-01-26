@@ -30,6 +30,7 @@ trait Segment {
   def apply[T](f: => T): T
   def collect[T](f: => Future[T])(implicit ec: ExecutionContext): Future[T]
 
+  def complete(cause: Throwable): Unit
   def complete(status: TraceStatus): Unit
   def isSuccess: Boolean = isCompleted && status.status == TraceStatus.Ok
   def isCompleted: Boolean = null != status

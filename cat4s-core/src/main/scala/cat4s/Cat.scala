@@ -66,7 +66,7 @@ object Cat {
     }
 
     def start(config: Config): Unit = this.synchronized {
-      actorSystem = ActorSystem(Name, config)
+      actorSystem = ActorSystem(Name, config.withoutPath("akka"))
       metrics = actorSystem.registerExtension(MetricRegistry)
       tracer = actorSystem.registerExtension(TraceRegistry)
       actorSystem.registerExtension(PluginLoader)

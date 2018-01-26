@@ -49,6 +49,8 @@ object Trace {
 
     @inline override def clock = _clock
     @inline override def status = _status
+
+    override def complete(cause: Throwable): Unit = complete(handler.resolve(cause))
     override def complete(status: TraceStatus): Unit = {
       assert(!isCompleted, "context has been completed.")
       assert(_segments.forall(_.isCompleted), "segments must all completed.")
@@ -83,6 +85,8 @@ object Trace {
     @volatile private var _clock: TraceClock = TraceClock(startMillis = startTime, elapsedNanos = -1L)
     @inline override def status = _status
     @inline override def clock = _clock
+
+    override def complete(cause: Throwable): Unit = complete(handler.resolve(cause))
     override def complete(status: TraceStatus): Unit = {
       assert(!isCompleted, "segment has been completed.")
       this._status = status

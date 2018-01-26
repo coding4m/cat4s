@@ -38,6 +38,7 @@ trait TraceContext {
   def withAsyncSegment[T](name: String)(f: => Future[T])(implicit ec: ExecutionContext): Future[T] = withAsyncSegment(name, Map.empty)(f)
   def withAsyncSegment[T](name: String, data: Map[String, String])(f: => Future[T])(implicit ec: ExecutionContext): Future[T] = withAsyncSegment(name, data)(f)
 
+  def complete(cause: Throwable): Unit
   def complete(status: TraceStatus): Unit
   def isSuccess: Boolean = isCompleted && status.status == TraceStatus.Ok
   def isCompleted: Boolean = null != status

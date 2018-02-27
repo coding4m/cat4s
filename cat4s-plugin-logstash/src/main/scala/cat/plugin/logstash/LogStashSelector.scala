@@ -19,6 +19,6 @@ package cat.plugin.logstash
 /**
  * @author siuming
  */
-trait StashPort {
+trait LogStashSelector {
 
 }

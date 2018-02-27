@@ -19,6 +19,6 @@ package cat.plugin.logstash
 /**
  * @author siuming
  */
-trait StashStrategy {
+class LogStashUdp {
 
 }

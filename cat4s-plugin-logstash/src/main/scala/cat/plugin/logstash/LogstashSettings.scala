@@ -21,6 +21,6 @@ import com.typesafe.config.Config
 /**
  * @author siuming
  */
-class LogStashSettings(config: Config) {
+class LogstashSettings(config: Config) {
 
 }

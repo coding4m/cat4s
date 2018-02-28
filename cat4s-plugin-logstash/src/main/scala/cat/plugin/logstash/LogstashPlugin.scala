@@ -16,9 +16,18 @@
 
 package cat.plugin.logstash
 
+import akka.actor.{ ExtendedActorSystem, ExtensionId, ExtensionIdProvider }
+import cat4s.{ Cat, Plugin }
+
 /**
  * @author siuming
  */
-trait LogStashPort {
-
+object LogstashPlugin extends ExtensionId[LogstashPlugin] with ExtensionIdProvider {
+  override def lookup() = LogstashPlugin
+  override def createExtension(system: ExtendedActorSystem) = new LogstashPlugin(system)
+}
+class LogstashPlugin(system: ExtendedActorSystem) extends Plugin {
+  val reporter = system.actorOf(LogstashReporter.props(), LogstashReporter.Name)
+  Cat.tracer.subscribe(reporter)
+  Cat.metrics.subscribe(reporter)
 }

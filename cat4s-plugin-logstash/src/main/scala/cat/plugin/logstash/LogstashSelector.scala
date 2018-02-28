@@ -16,22 +16,9 @@
 
 package cat.plugin.logstash
 
-import akka.actor.{ Actor, Props }
-import cat4s.metric.MetricInfo
-import cat4s.trace.TraceInfo
-
 /**
  * @author siuming
  */
-object LogStashReporter {
-  val Name = "logstash-reporter"
-  def props(): Props =
-    Props(new LogStashReporter)
-}
-class LogStashReporter extends Actor {
-  private val settings = new LogStashSettings(context.system.settings.config)
-  override def receive = {
-    case info: TraceInfo  =>
-    case info: MetricInfo =>
-  }
+trait LogstashSelector {
+
 }

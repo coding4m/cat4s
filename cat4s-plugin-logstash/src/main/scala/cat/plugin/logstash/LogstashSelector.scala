@@ -16,9 +16,31 @@
 
 package cat.plugin.logstash
 
+import java.util.concurrent.atomic.AtomicLong
+
+import scala.util.Random
+
 /**
  * @author siuming
  */
 trait LogstashSelector {
-
+  def select(destinations: Seq[LogstashDestination]): LogstashDestination
+}
+object RandomSelector extends RandomSelector {
+  val Name = "random"
+}
+trait RandomSelector extends LogstashSelector {
+  private val random = new Random()
+  override def select(destinations: Seq[LogstashDestination]) = {
+    destinations(random.nextInt(destinations.size))
+  }
+}
+object RoundRobinSelector extends RoundRobinSelector {
+  val Name = "roundrobin"
+}
+trait RoundRobinSelector extends LogstashSelector {
+  val counter = new AtomicLong()
+  override def select(destinations: Seq[LogstashDestination]) = {
+    destinations((counter.getAndIncrement() % destinations.size).toInt)
+  }
 }

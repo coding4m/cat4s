@@ -16,9 +16,19 @@
 
 package cat.plugin.logstash
 
+import java.io.Closeable
+import java.util.UUID
+
+import scala.util.matching.Regex
+
 /**
  * @author siuming
  */
-trait LogstashPort {
-
+object LogstashDestination {
+  val HostAndPort: Regex = "([^:]+):([0-9]+)".r
+  val HostSeparator: String = ",|;"
+}
+trait LogstashDestination extends Closeable {
+  val id: String = UUID.randomUUID().toString
+  def send(bytes: Array[Byte]): Unit
 }

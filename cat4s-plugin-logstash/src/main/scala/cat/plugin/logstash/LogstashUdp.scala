@@ -16,9 +16,27 @@
 
 package cat.plugin.logstash
 
+import java.net.{ DatagramPacket, DatagramSocket, InetSocketAddress }
+
 /**
  * @author siuming
  */
-class LogstashUdp {
+class LogstashUdp(host: String, port: Int) extends LogstashDestination {
+  val address = new InetSocketAddress(host, port)
+  val socket = new DatagramSocket()
 
+  override def send(bytes: Array[Byte]): Unit = {
+    val packet = new DatagramPacket(bytes, 0, bytes.length, address)
+    socket.send(packet)
+  }
+
+  override def close(): Unit = {
+    if (null != socket) {
+      try {
+        socket.close()
+      } catch {
+        case _: Throwable => //
+      }
+    }
+  }
 }

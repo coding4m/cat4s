@@ -30,7 +30,7 @@ object ConsoleReporter {
 }
 class ConsoleReporter extends Actor {
   override def receive = {
-    case info: TraceInfo  => println(info) //todo
-    case info: MetricInfo => println(info) //todo
+    case info: TraceInfo  => //todo
+    case info: MetricInfo => //todo
   }
 }

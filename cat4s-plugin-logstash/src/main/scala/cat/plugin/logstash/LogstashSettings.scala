@@ -16,11 +16,45 @@
 
 package cat.plugin.logstash
 
+import java.util.concurrent.TimeUnit
+
 import com.typesafe.config.Config
 
 /**
  * @author siuming
  */
 class LogstashSettings(config: Config) {
+  val serviceName =
+    config.getString("cat.plugin.logstash.service-name")
+
+  val serviceHost =
+    config.getString("cat.plugin.logstash.service-host")
+
+  val servicePort =
+    config.getString("cat.plugin.logstash.service-port")
+
+  val selector = config.getString("cat.plugin.logstash.destination-selector").toLowerCase match {
+    case RoundRobinSelector.Name => RoundRobinSelector
+    case _                       => RandomSelector
+  }
+
+  val destinations = {
+    import LogstashDestination._
+    config.getString("cat.plugin.logstash.destinations").split(HostSeparator) collect {
+      case HostAndPort(host, port) => new LogstashUdp(host, port.toInt)
+    }
+  }
+
+  val maxBufferSize =
+    config.getInt("cat.plugin.logstash.max-buffer-size")
+
+  val maxRetries =
+    config.getInt("cat.plugin.logstash.max-retries")
+
+  val maxFails =
+    config.getInt("cat.plugin.logstash.max-fails")
+
+  val failTimeout =
+    config.getDuration("cat.plugin.logstash.fail-timeout", TimeUnit.MILLISECONDS)
 
 }

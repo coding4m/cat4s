@@ -19,6 +19,5 @@ package cat.plugin.logstash
 /**
  * @author siuming
  */
-class LogstashRouter {
-
-}
+class LogstashException extends RuntimeException
+class LogstashNotFoundException extends LogstashException

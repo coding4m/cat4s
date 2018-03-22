@@ -46,6 +46,7 @@ object ProjectDependencies {
   val Flume =  "org.apache.flume" % "flume-ng-sdk" % FlumeVersion
 
   val AkkaActor =            "com.typesafe.akka"         %% "akka-actor"                % AkkaVersion
+  val AkkaStream =           "com.typesafe.akka"         %% "akka-stream"                % AkkaVersion
   val AspectJRuntime =       "org.aspectj" % "aspectjrt" % AspectJVersion
   val AspectJWeaver =        "org.aspectj" % "aspectjweaver" % AspectJVersion
 }

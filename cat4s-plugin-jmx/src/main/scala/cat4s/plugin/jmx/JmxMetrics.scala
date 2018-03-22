@@ -41,16 +41,16 @@ private[jmx] object JmxMetrics extends SampleRecorderFactory[JmxMetrics] {
 }
 private[jmx] class JmxMetrics extends SampleRecorderBase {
   import JmxMetrics.GCNames
-  val classesLoaded = gauge("classes-loaded", 0L)
-  val classesUnloaded = gauge("classes-unloaded", 0L)
-  val classesTotalLoaded = gauge("classes-total-loaded", 0L)
+  val classesLoaded = gauge("classes_loaded", 0L)
+  val classesUnloaded = gauge("classes_unloaded", 0L)
+  val classesTotalLoaded = gauge("classes_total-loaded", 0L)
 
-  val heapMemory = gauge("heap-memory", 0L)
-  val nonHeapMemory = gauge("non-heap-memory", 0L)
+  val heapMemory = gauge("heap_memory", 0L)
+  val nonHeapMemory = gauge("non_heap_memory", 0L)
 
-  val threadCount = gauge("thread-count", 0L)
-  val daemonThreadCount = gauge("daemon-thread-count", 0L)
+  val threadCount = gauge("thread_count", 0L)
+  val daemonThreadCount = gauge("daemon_thread_count", 0L)
 
-  def gcCount(name: String) = gauge(s"${GCNames.getOrElse(name, name)}-gc-count", 0L)
-  def gcTime(name: String) = gauge(s"${GCNames.getOrElse(name, name)}-gc-time", 0L)
+  def gcCount(name: String) = gauge(s"${GCNames.getOrElse(name, name)}_gc_count", 0L)
+  def gcTime(name: String) = gauge(s"${GCNames.getOrElse(name, name)}_gc_time", 0L)
 }

@@ -19,4 +19,4 @@ package cat4s.metric
 /**
  * @author siuming
  */
-case class MetricInfo(metrics: Map[Sample, SampleSnapshot])
+case class MetricInfo(samples: Map[Sample, SampleSnapshot])

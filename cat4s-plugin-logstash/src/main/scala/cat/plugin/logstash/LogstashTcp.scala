@@ -19,6 +19,6 @@ package cat.plugin.logstash
 /**
  * @author siuming
  */
-class LogstashTcp {
+object LogstashTcp {
 
 }

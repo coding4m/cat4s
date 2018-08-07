@@ -21,7 +21,7 @@ object ProjectDependencyVersions {
   val LogbackVersion = "1.2.3"
   val Json4sVersion = "3.6.0"
   val FlumeVersion = "1.8.0"
-  val AkkaVersion = "2.5.10"
+  val AkkaVersion = "2.5.14"
   val AspectJVersion = "1.8.13"
 }
 
